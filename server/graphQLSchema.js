@@ -33,10 +33,10 @@ const UserType = new GraphQLObjectType({
                 return messages.filter(message => message.senderId === user.id || message.recipientId === user.id);
             }
         },
-        conversationWith: { //needs fixin'
+        conversationWith: {
             type: new GraphQLList(MessageType),
             args: { partnerId: { type: GraphQLInt } },
-            resolve: (user) => {
+            resolve: (user, args) => {
                 return messages.filter(message => {
                     return (message.senderId === args.partnerId 
                             && message.recipientId === user.id) 
@@ -228,6 +228,40 @@ const RootMutationType = new GraphQLObjectType({
             },
             resolve: (parent, args) => {
                 return skills.splice(args.id - 1, 1)[0]; 
+            }
+        },
+        addClass: {
+            type: ClassType,
+            description: 'Add a class session',
+            args: {
+                skillId: { type: GraphQLNonNull(GraphQLInt) },
+                learnerId: { type: GraphQLNonNull(GraphQLInt) }
+            },
+            resolve: (parent, args) => {
+                const classItem = {
+                    id: classes.length + 1,
+                    skillId: args.skillId,
+                    confirmed: false,
+                    learnerId: args.learnerId,
+                    attended: false
+                };
+                classes.push(classItem);
+                return classItem;
+            }
+        },
+        updateClass: {
+            type: ClassType,
+            description: 'Update a class session',
+            args: {
+                id: { type: GraphQLNonNull(GraphQLInt) },
+                confirmed: { type: GraphQLBoolean },
+                attended: { type: GraphQLBoolean }
+            },
+            resolve: (parent, args) => {
+                const classItem = classes.find(classItem => classItem.id === args.id);
+                if (args.confirmed) classItem.confirmed = args.confirmed;
+                if (args.attended) classItem.attended = args.attended;
+                return classItem;
             }
         }
     })
