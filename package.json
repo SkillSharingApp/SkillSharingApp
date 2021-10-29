@@ -7,11 +7,15 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "gqlStart": "nodemon ./server/index.js"
   },
   "dependencies": {
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/native-stack": "^6.2.5",
+    "express": "^4.17.1",
+    "express-graphql": "^0.12.0",
+    "graphql": "^15.7.2",
     "react": "17.0.2",
     "react-native": "0.66.1",
     "react-native-safe-area-context": "^3.3.2",
@@ -25,6 +29,7 @@
     "eslint": "7.14.0",
     "jest": "^26.6.3",
     "metro-react-native-babel-preset": "^0.66.2",
+    "nodemon": "^2.0.14",
     "react-test-renderer": "17.0.2"
   },
   "jest": {
