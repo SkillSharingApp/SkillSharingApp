@@ -1,14 +1,34 @@
 import React from 'react';
-import {Button} from 'react-native';
+import {Button, View} from 'react-native';
 
 const HomeView = ({ navigation }) => {
     return ( 
+      <View>
       <Button
-        title="GO TO LOGIN"
+        title="LEARN"
         onPress={() =>
-          navigation.navigate('Login')
+          navigation.navigate('LearnList')
         }
       />
+      <Button
+        title="TEACH"
+        onPress={() =>
+          navigation.navigate('TeachList')
+        }
+      />
+      <Button
+        title="SESSION SCHEDULE"
+        onPress={() =>
+          navigation.navigate('ScheduleList')
+        }
+      />
+      <Button
+        title="MESSAGES"
+        onPress={() =>
+          navigation.navigate('MessageList')
+        }
+      />
+      </View>
     );
   };
 
