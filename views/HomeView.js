@@ -12,4 +12,5 @@ const HomeView = ({ navigation }) => {
     );
   };
 
-  export default HomeView;
+
+export default HomeView;
