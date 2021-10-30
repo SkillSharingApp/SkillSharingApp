@@ -9,7 +9,7 @@ const {
 } = require('graphql');
 
 
-const { users, skills, classes, messages } = require('./fakeData');
+const { users, skills, classes, messages, sessions } = require('./fakeData');
 
 const UserType = new GraphQLObjectType({
     name: 'User',
@@ -123,6 +123,21 @@ const MessageType = new GraphQLObjectType({
     })
 });
 
+const SessionType = new GraphQLObjectType({
+    name: 'Session',
+    description: 'This represents a single session of a single user',
+    fields: () => ({
+        token: { type: GraphQLNonNull(GraphQLString) },
+        userId: { type: GraphQLNonNull(GraphQLInt) },
+        user: { 
+            type: UserType,
+            resolve: (session) => {
+                return users.find(user => user.id === session.userId);
+            }
+        }
+    })
+})
+
 const RootQueryType = new GraphQLObjectType({
     name: 'Query',
     description: 'Root Query',
@@ -146,6 +161,11 @@ const RootQueryType = new GraphQLObjectType({
             type: new GraphQLList(MessageType),
             description: 'A list of all messages between users',
             resolve: () => messages
+        },
+        sessions: {
+            type: new GraphQLList(SessionType),
+            description: 'A list of all active user sessions',
+            resolve: () => sessions
         }
     })
 });
@@ -259,9 +279,67 @@ const RootMutationType = new GraphQLObjectType({
             },
             resolve: (parent, args) => {
                 const classItem = classes.find(classItem => classItem.id === args.id);
-                if (args.confirmed) classItem.confirmed = args.confirmed;
+                // if the confirmed status is updated from false to true - one credit should be deducted
+                // from the learner's creditBalance?
+                if (args.confirmed) classItem.confirmed = args.confirmed; 
                 if (args.attended) classItem.attended = args.attended;
                 return classItem;
+            }
+        },
+        deleteClass: {
+            type: ClassType,
+            description: 'Delete a class session',
+            args: {
+                id: { type: GraphQLNonNull(GraphQLInt) }
+            },
+            resolve: (parent, args) => {
+                return classes.splice(args.id - 1, 1)[0];
+            }
+        },
+        addMessage: {
+            type: MessageType,
+            description: 'Add a single message',
+            args: {
+                senderId: { type: GraphQLNonNull(GraphQLInt) },
+                recipientId: { type: GraphQLNonNull(GraphQLInt) },
+                content: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: (parent, args) => {
+                const message = {
+                    id: messages.length + 1,
+                    senderId: args.senderId,
+                    recipientId: args.recipientId,
+                    content: args.content,
+                    timestamp: 'now'
+                };
+                messages.push(message);
+                return message;
+            }
+        },
+        addSession: {
+            type: SessionType,
+            description: 'Add a single active user session',
+            args: {
+                token: { type: GraphQLNonNull(GraphQLString) },
+                userId: { type: GraphQLNonNull(GraphQLInt) }
+            },
+            resolve: (parent, args) => {
+                const session = {
+                    token: args.token,
+                    userId: args.userId
+                };
+                sessions.push(session);
+                return session;
+            }
+        },
+        deleteSession: {
+            type: SessionType,
+            description: 'Delete a single active user session to end the session',
+            args: {
+                token: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: (parent, args) => {
+                return sessions.splice(sessions.indexOf(sessions.find(session => session.token === args.token)), 1)[0];
             }
         }
     })

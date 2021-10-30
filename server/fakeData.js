@@ -22,5 +22,11 @@ const messages = [
 
 ]
 
+const sessions = [
+    { token: 'fhaweuog', userId: 1 },
+    { token: 'hiegwaohg', userId: 3 },
+    { token: 'jhvioawi', userId: 1 }
+]
 
-module.exports = { users, skills, classes, messages }
+
+module.exports = { users, skills, classes, messages, sessions }
