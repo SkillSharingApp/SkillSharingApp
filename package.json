@@ -11,6 +11,7 @@
     "gqlStart": "nodemon ./server/index.js"
   },
   "dependencies": {
+    "@apollo/client": "^3.4.16",
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/native-stack": "^6.2.5",
     "express": "^4.17.1",

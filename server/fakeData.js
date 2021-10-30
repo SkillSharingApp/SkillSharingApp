@@ -7,7 +7,7 @@ const users = [
 
 const skills = [
     { id: 1, teacherId: 1, name: 'Hot Air Ballooning', description: 'a skillful skill', availability: 'Mondays', duration: 60, overallRating: 5, numberOfRatings: 1 },
-    { id: 2, teacherId: 1, name: 'Woodworking', description: 'a skillful skill', availability: 'Mondays', duration: 60, overallRating: 3, numberOfRatings: 4 },
+    { id: 2, teacherId: 1, name: 'Woodworking', description: 'a skillful skill', availability: 'Mondays', duration: 60, overallRating: 3.2, numberOfRatings: 4 },
     { id: 3, teacherId: 2, name: 'Pestering Sam', description: 'a skillful skill', availability: 'All the times', duration: 90, overallRating: 5, numberOfRatings: 12 }
 ]
 

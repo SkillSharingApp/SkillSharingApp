@@ -166,6 +166,16 @@ const RootQueryType = new GraphQLObjectType({
             type: new GraphQLList(SessionType),
             description: 'A list of all active user sessions',
             resolve: () => sessions
+        },
+        singleSkill: {
+            type: SkillType,
+            description: 'A single skill',
+            args: {
+                id: { type: GraphQLNonNull(GraphQLInt) }
+            },
+            resolve: (parent, args) => { 
+                return skills.find(skillItem => skillItem.id === args.id);
+            }
         }
     })
 });
