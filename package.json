@@ -8,15 +8,21 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
-    "gqlStart": "nodemon ./server/index.js"
+    "gqlStart": "nodemon ./server/index.js",
+    "serverStart": "nodemon ./server/server.js"
   },
   "dependencies": {
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/native-stack": "^6.2.5",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-graphql": "^0.12.0",
     "graphql": "^15.7.2",
     "mariadb": "^2.5.5",
+    "path": "^0.12.7",
     "react": "17.0.2",
     "react-native": "0.66.1",
     "react-native-safe-area-context": "^3.3.2",
