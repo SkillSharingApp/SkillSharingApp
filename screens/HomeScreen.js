@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, View} from 'react-native';
 
-const HomeView = ({ navigation }) => {
+export default HomeScreen = ({ navigation }) => {
     return ( 
       <View>
       <Button
@@ -32,4 +32,3 @@ const HomeView = ({ navigation }) => {
     );
   };
 
-  export default HomeView;

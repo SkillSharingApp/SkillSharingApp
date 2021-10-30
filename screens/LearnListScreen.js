@@ -1,11 +1,10 @@
-import { NavigationContainer } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
 import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import LearnListCard from "../components/LearnListCard";
 
 
 
-const LearnListView = ({ navigation }) => {
+export default  LearnListScreen = ({ navigation }) => {
 
     const dummyClasses =[{
        skill: 'Kendo',
@@ -57,4 +56,3 @@ const LearnListView = ({ navigation }) => {
     );
 };
 
-export default LearnListView;
