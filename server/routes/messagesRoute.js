@@ -12,3 +12,4 @@ const router = express.Router();
 //create a message
 
 */
+module.exports = router;

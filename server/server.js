@@ -4,7 +4,8 @@ require('dotenv').config();
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const pool = require('.../Model/dbModel');server/Model/dbModel.js
+//const cookieparser = require("cookieparser");
+//const pool = require('.../Model/dbModel');
 const {skills} = require('./fakeData');
 
 
@@ -15,11 +16,11 @@ const userRouter = require('./routes/userRoute');
 const skillRouter = require('./routes/skillsRoute');
 const messageRouter = require('./routes/messagesRoute');
 const sessionRouter = require('./routes/sessionRoute');
-
+const classRouter = require('./routes/classRouter')
 
 app.use(cors());
 app.use(express.json());
-app.use(cookieParser());
+//app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: false}));
 
 
@@ -29,7 +30,7 @@ app.use('/', userRouter);
 app.use('/skills', skillRouter);
 app.use('/messages', messageRouter);
 app.use('/session', sessionRouter);
-
+app.use('/classes',classRouter)
 
 
 

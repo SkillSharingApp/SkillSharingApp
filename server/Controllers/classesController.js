@@ -1,4 +1,4 @@
-
+const db = require('../Model/dbModel');
 
 
 //get classes

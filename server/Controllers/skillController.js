@@ -1,4 +1,5 @@
 //mariaDb
+const db = require('../Model/dbModel');
 
 //create a skill
 
