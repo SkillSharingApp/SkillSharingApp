@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 //routes
 app.use(express.static('public'));
-app.use('/', userRouter);
+app.use('/user', userRouter);
 app.use('/skills', skillRouter);
 app.use('/messages', messageRouter);
 app.use('/session', sessionRouter);
@@ -46,7 +46,7 @@ app.use(function (err, req, res, next) {
   const defaultErr = {
     log: 'Express error handler caught unknown middleware error.',
     status: 400,
-    message: { err: 'An unknown error occurred.' },
+    message: { err: 'An unknown error occurred. gloabl error' },
   };
   Object.assign(defaultErr, err);
   //console.log(defaultErr.log);

@@ -6,8 +6,8 @@ const sessionController =require('../Controllers/sessionController')
 
 
 
-router.post('/createUser',[userController.createUser],(req, res) => {
-    return res.status(209).send();
+router.post('/create',[userController.createUser],(req, res) => {
+    return res.status(200).send({test:test});
     
   });
 /*

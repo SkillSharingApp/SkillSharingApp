@@ -1,5 +1,6 @@
 const db = require('../Model/dbModel');
 const bcrypt = require('bcrypt');
+const salt_rounds = 10;
 
 const userController ={};
 //create a user
@@ -7,16 +8,14 @@ userController.createUser = (req, res, next) => {
     if (req.body.email && req.body.password) {
       try{
         bcrypt.hash(req.body.password, salt_rounds, (error, hash) => {
-        //error check
-        if (error) console.log('bcrypt error');
-        //create user w encrypted pw
+        
+        if (error) console.log(`bycrpt: ${error}`)
         else {
-          const queryString = `INSERT INTO Users (username, email, password) VALUES ($1, $2, $3)`;
+          const SqlQuery = `INSERT INTO Users (username, email, password) VALUES ($1, $2, $3)`;
   
-          db.query(queryString, [req.body.name, req.body.email, hash])
+          db.query(SqlQuery, [req.body.name, req.body.email, hash],'userController.createUser')
             .then(result => {
-                
-              if (result) return next();
+               console.log(result)
             })
             .catch(e => {
               console.log('CreateUser Error: ', e);
@@ -27,8 +26,10 @@ userController.createUser = (req, res, next) => {
 
       }catch (error) {
         next({
-          log: 'createUserController.createUser', error,
-        });
+        log: error,
+        status: 400,
+        message: { error:  `userController.createUser ${error}`  },
+    })
       
     }
   };
