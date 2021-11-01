@@ -15,7 +15,7 @@ import {
 
 const App = () => {
   return (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+  <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center" }}>
     <View>
       <Text>webRTC</Text>
     </View>
