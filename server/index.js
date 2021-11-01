@@ -7,18 +7,22 @@ const { ApolloServer } = require('apollo-server-express');
 
 const app = express();
 
+const server = new ApolloServer({typeDefs, resolvers})
 
-const launchServer = async () => {
+server.applyMiddleware({ app });
+
+app.listen(3000, () => console.log('Server running on port 3000....'));
+// const launchServer = async () => {
     
-    const server = new ApolloServer({
-        modules: [require('./graphql/users')]
-    });
+//     const server = new ApolloServer({
+//         modules: [require('./graphql/users')]
+//     });
 
-    await server.start();
-    server.applyMiddleware({ app });
-}
+//     await server.start();
+//     server.applyMiddleware({ app });
+// }
 
-launchServer();
+//launchServer();
 
 // const schema = new GraphQLSchema({
 //     query: RootQueryType,
@@ -33,4 +37,4 @@ launchServer();
     
     
     
-app.listen(3000, () => console.log('Server running on port 3000....'));
+
