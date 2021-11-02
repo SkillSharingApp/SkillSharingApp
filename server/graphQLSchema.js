@@ -17,7 +17,8 @@ const UserType = new GraphQLObjectType({
     description: 'This represents a sigle user',
     fields: () => ({
         id: { type: GraphQLNonNull(GraphQLID) },
-        name: { type: GraphQLNonNull(GraphQLString) },
+        firstName: { type: GraphQLNonNull(GraphQLString) },
+        lastName: { type: GraphQLNonNull(GraphQLString) },
         username: { type: GraphQLNonNull(GraphQLString) },
         email: { type: GraphQLNonNull(GraphQLString) },
         password: { type: GraphQLNonNull(GraphQLString) },
@@ -25,31 +26,28 @@ const UserType = new GraphQLObjectType({
         skills: {
             type: new GraphQLList(SkillType),
             resolve: (user) => {
-                return db.models.SkillsOffered.findAll({ where: { TeacherId: user.id }});//filter(skill => skill.TeacherId === user.id);
-            }
+                return db.models.SkillsOffered.findAll({ where: { TeacherId: user.id }});
         },
         messages: {
             type: new GraphQLList(MessageType),
             resolve: (user) => {
-                return db.models.Messages.findAll();
+                return db.models.Messages.findAll({where: {senderId:user.senderId}});
             }
         },
         conversationWith: {
             type: new GraphQLList(MessageType),
             args: { partnerId: { type: GraphQLInt } },
-            resolve: (user, args) => {
-                return db.models.Messages.filter(message => {
-                    return (message.senderId === args.partnerId 
-                            && message.recipientId === user.id) 
-                        || (message.senderId === user.id 
-                             && message.recipientId === args.partnerId);
-                });
+            resolve: (user) => {
+                return db.models.Messages.findAll({where :{
+                    senderId:user.id,
+                    recipentId: user.recipentId 
+                } });
             }
         },
         classes: {
             type: new GraphQLList(ClassType),
             resolve: (user) => {
-                return db.models.Classes.filter(item => item.learner === user.id);
+                return db.models.Classes.findAll();
             }
         }
     })

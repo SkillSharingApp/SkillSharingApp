@@ -91,9 +91,7 @@ const Sessions = sequelize.define('Sessions',{
             deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
         },
     },
-    session:{
-        type: Sequelize.STRING
-    },
+
 });
 const Messages = sequelize.define('Messages',{
     id: {
@@ -139,7 +137,7 @@ const SkillsOffered = sequelize.define('SkillsOffered',{
         type: Sequelize.TIME,
         allowNull: false
     },
-    TeacherId:{
+    teacherId:{
         type: Sequelize.UUID,
         references: {
             model: User,
@@ -148,7 +146,7 @@ const SkillsOffered = sequelize.define('SkillsOffered',{
           },
 
     },
-    avalability:{
+    availability:{
         type: Sequelize.STRING
     },
     overallRating:{
@@ -180,13 +178,7 @@ SkillsOffered.belongsTo(User);
 //     });
 //     }).catch(function(e) {
 //         console.log(`server/db,js line 176 ${e}`); 
-//})
-// sequelize.sync({force:true}).then(()=>{
-
-//         let conn = User.findAll();
-//         console.log(conn)
-//     }).catch(function(e) {
-//         console.log(`server/db,js line 176 ${e}`); 
 // })
+
 
 module.exports = sequelize
