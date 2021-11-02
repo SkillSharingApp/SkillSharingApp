@@ -13,7 +13,7 @@ const app = express();
 
 //server.applyMiddleware({ app });
 
-app.listen(3000, () => console.log('Server running on port 3000....'));
+
 // const launchServer = async () => {
     
 //     const server = new ApolloServer({
@@ -35,8 +35,9 @@ const schema = new GraphQLSchema({
 app.use('/graphql', graphqlHTTP({
         schema: schema,
         graphiql: true
-    }));
+    })
+);
     
     
     
-
+app.listen(3000, () => console.log('Server running on port 3000....'));

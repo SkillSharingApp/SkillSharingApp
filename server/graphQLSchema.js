@@ -1,3 +1,4 @@
+const { date } = require('faker');
 const { 
     GraphQLObjectType,
     GraphQLString,
@@ -9,19 +10,31 @@ const {
     GraphQLID,
 } = require('graphql');
 const db = require('./db');
-//add db.models
-//stephanie
 
 const UserType = new GraphQLObjectType({
     name: 'User',
     description: 'This represents a sigle user',
-    fields: () => ({
-        id: { type: GraphQLNonNull(GraphQLID) },
-        firstName: { type: GraphQLNonNull(GraphQLString) },
-        lastName: { type: GraphQLNonNull(GraphQLString) },
-        username: { type: GraphQLNonNull(GraphQLString) },
-        email: { type: GraphQLNonNull(GraphQLString) },
-        password: { type: GraphQLNonNull(GraphQLString) },
+    fields: () =>{
+        return {
+        id: { 
+            type: GraphQLNonNull(GraphQLID), 
+            resolve: (user)=>{return user.id}
+        },
+        firstName: { type: GraphQLNonNull(GraphQLString),
+            resolve: (user)=>{return user.firstName} 
+        },
+        lastName: { type: GraphQLNonNull(GraphQLString),
+            resolve: (user)=>{return user.lastName} 
+        },
+        username: { type: GraphQLNonNull(GraphQLString), 
+            resolve: (user)=>{return user.username}
+        },
+        email: { type: GraphQLNonNull(GraphQLString),
+            resolve: (user)=>{return user.email}
+        },
+        password: { type: GraphQLNonNull(GraphQLString),
+            resolve: (user)=>{return user.password}
+        },
         creditBalance: { type: GraphQLNonNull(GraphQLInt) },
         skills: {
             type: new GraphQLList(SkillType),
@@ -56,7 +69,8 @@ const UserType = new GraphQLObjectType({
                 
             }
         }
-    }),
+      }
+    },
 });
 
 const SkillType = new GraphQLObjectType({
@@ -92,18 +106,18 @@ const ClassType = new GraphQLObjectType({
         learner: {
             type: UserType,
             resolve: (item) => {
-                return 
-                users.find(user => user.id === item.learnerId);
-                db.models.User.findAll
+                return db.models.User.findAll({where:{id: item.learnerId}})
             }
         },
         skill: { 
             type: SkillType,
             resolve: (classItem) => {
-                return skills.find(skill => skill.id === classItem.skillId);
-            }
+                return db.models.SkillsOffered.find({where:{
+                    skillId:classItem.skillId
+                }});
         }
-    })
+        },
+    }),
 });
 
 const MessageType = new GraphQLObjectType({
@@ -118,13 +132,15 @@ const MessageType = new GraphQLObjectType({
         sender: {
             type: UserType,
             resolve: (message) => {
-                return users.find(user => user.id === message.senderId);
+                return db.models.User.find({where :{id:message.senderId}})
+                //users.find(user => user.id === message.senderId);
             }
         },
         recipient: {
             type: UserType,
             resolve: (message) => {
-                return users.find(user => user.id === message.recipientId);
+                return db.models.User.find({where :{id:message.senderId}})
+                //users.find(user => user.id === message.recipientId);
             }
         }
     })
@@ -139,7 +155,8 @@ const SessionType = new GraphQLObjectType({
         user: { 
             type: UserType,
             resolve: (session) => {
-                return users.find(user => user.id === session.userId);
+                return db.models.User.find({where :{id: session.userId}})
+                //users.find(user => user.id === session.userId);
             }
         }
     })
@@ -264,16 +281,50 @@ const RootMutationType = new GraphQLObjectType({
             },
             resolve: (parent, args) => {
                 const user = { 
-                    name: args.name,
+                    frstName: args.firstName,
                     username: args.username,
-                    email: args.email,
+                    email: args.email.toLowerCase(),
                     password: args.password,
                     creditBalance: 5
                 };
-                users.push(user);
-                return user;
+                
+                return db.models.User.create({user})
+                
             }
         },
+        updateUser: {
+            type: UserType,
+            description: 'Update a user info ',
+            args: {
+                id: { type: GraphQLNonNull(GraphQLID) },
+                firstName: { type: GraphQLString },
+                lastName: { type: GraphQLString },
+                username:{type: GraphQLNonNull(GraphQLString)},
+                email:{type: GraphQLNonNull(GraphQLString)},
+                oldPassword:{type: GraphQLNonNull(GraphQLString)},
+                password:{type: GraphQLNonNull(GraphQLString)},
+                creditBalance:{type: GraphQLNonNull(GraphQLInt)},
+            },
+            resolve: (parent, args) => {
+                const updatedInfo ={}
+                let currentPass = db.models.find({where:{id:args.id}})
+                    if (args.password){
+                        if (args.oldpassword === currentPass.password ||args.oldpassword === currentPass[0].password){
+                            updatedInfo.password =args.password
+                        }else {
+                            throw new Error("Passwords Do not match!")
+                        }
+                    }
+                    for (const [key,value] of Object.entries(args)){
+                        if (key !=="id" || key !== "password"|| key !== "oldpassword"){
+                            updatedInfo[key]=value
+                        }
+                    }
+                return db.models.User.update({id:args.id},updatedInfo)
+               
+            }
+        },
+
         addSkill: {
             type: SkillType,
             description: 'Add a skill offered by a user',
@@ -294,8 +345,9 @@ const RootMutationType = new GraphQLObjectType({
                     overallRating: 0,
                     numberOfRatings: 0
                 };
-                skills.push(skill);
-                return skill;
+                return db.models.SkillsOffered.create(
+                    skill
+                )
             }
         },
         updateSkill: {
@@ -309,7 +361,9 @@ const RootMutationType = new GraphQLObjectType({
                 duration: { type: GraphQLInt }
             },
             resolve: (parent, args) => {
-                const skill = skills.find(skill => skill.id === args.id);
+
+                //stephanie
+                const skill = db.models.SkillOffered.findOne({where:{skillId: args.id}});
                 if (args.name) skill.name = args.name;
                 if (args.description) skill.description = args.description;
                 if (args.availability) skill.availability = args.availability;
@@ -324,7 +378,9 @@ const RootMutationType = new GraphQLObjectType({
                 id: { type: GraphQLNonNull(GraphQLID) }
             },
             resolve: (parent, args) => {
-                return skills.splice(args.id - 1, 1)[0]; 
+                // let skill = db.models.SkillOffered.findOne({where:{id: args.id}}) 
+                // return skill.destroy
+                return db.models.SkillOffered.delete(args.id)
             }
         },
         addClass: {
@@ -336,14 +392,12 @@ const RootMutationType = new GraphQLObjectType({
             },
             resolve: (parent, args) => {
                 const classItem = {
-                    id: classes.length + 1,
                     skillId: args.skillId,
                     confirmed: false,
                     learnerId: args.learnerId,
                     attended: false
                 };
-                classes.push(classItem);
-                return classItem;
+                return db.models.Classes.create(classItem);
             }
         },
         updateClass: {
@@ -355,12 +409,14 @@ const RootMutationType = new GraphQLObjectType({
                 attended: { type: GraphQLBoolean }
             },
             resolve: (parent, args) => {
-                const classItem = classes.find(classItem => classItem.id === args.id);
-                // if the confirmed status is updated from false to true - one credit should be deducted
-                // from the learner's creditBalance?
-                if (args.confirmed) classItem.confirmed = args.confirmed; 
-                if (args.attended) classItem.attended = args.attended;
-                return classItem;
+                const updatedInfo ={}
+                for (const [key,value] of Object.entries(args)){
+                    if (key !== 'id'){
+                    updatedInfo[key]= value 
+                    }
+                }
+                db.models.Classes.update({id:args.id},updatedInfo)
+               
             }
         },
         deleteClass: {
@@ -370,7 +426,8 @@ const RootMutationType = new GraphQLObjectType({
                 id: { type: GraphQLNonNull(GraphQLID) }
             },
             resolve: (parent, args) => {
-                return classes.splice(args.id - 1, 1)[0];
+                let aClass = db.models.Classes.findOne({where:{id: args.id}}) 
+                return aClass.destroy;
             }
         },
         addMessage: {
@@ -383,14 +440,13 @@ const RootMutationType = new GraphQLObjectType({
             },
             resolve: (parent, args) => {
                 const message = {
-                    id: messages.length + 1,
                     senderId: args.senderId,
                     recipientId: args.recipientId,
                     content: args.content,
-                    timestamp: 'now'
+                    timestamp: new Date().toString()
                 };
-                messages.push(message);
-                return message;
+                return db.models.Messages.create(message)
+                
             }
         },
         addSession: {
@@ -405,8 +461,7 @@ const RootMutationType = new GraphQLObjectType({
                     token: args.token,
                     userId: args.userId
                 };
-                sessions.push(session);
-                return session;
+               return db.models.Sessions.create(session)
             }
         },
         deleteSession: {
@@ -416,7 +471,9 @@ const RootMutationType = new GraphQLObjectType({
                 token: { type: GraphQLNonNull(GraphQLString) }
             },
             resolve: (parent, args) => {
-                return sessions.splice(sessions.indexOf(sessions.find(session => session.token === args.token)), 1)[0];
+                let sessh = db.models.Classes.findOne({where:{id: args.id}}) 
+                return sessh.destroy;
+                //sessions.splice(sessions.indexOf(sessions.find(session => session.token === args.token)), 1)[0];
             }
         }
     })

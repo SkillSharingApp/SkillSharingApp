@@ -167,6 +167,8 @@ Messages.belongsTo(User);
 User.hasMany(SkillsOffered);
 SkillsOffered.belongsTo(User);
 
+
+//creates 4 people 
 // sequelize.sync({force:true}).then(()=>{
 //     _.times(4,()=>{
 //         return User.create({
