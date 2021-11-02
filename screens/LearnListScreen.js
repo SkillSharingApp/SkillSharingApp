@@ -1,4 +1,3 @@
-import { NavigationContainer } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
 import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import { useQuery, gql } from "@apollo/client";
@@ -26,7 +25,8 @@ const SKILLS = gql`
     //     }
     // }
 
-const LearnListView = ({ navigation }) => {
+export default  LearnListScreen = ({ route, navigation }) => {
+    const {id, name} = route.params 
 
     const { loading, error, data } = useQuery(SKILLS);
 
@@ -35,7 +35,7 @@ const LearnListView = ({ navigation }) => {
 
     return (
         <View> 
-            <Text>Welcome to LearnListView</Text>
+            <Text>What do you wanna learn {name}?</Text>
             <FlatList
                 data={data.skills}
                 renderItem={({ item }) => (
@@ -52,4 +52,3 @@ const LearnListView = ({ navigation }) => {
     );
 };
 
-export default LearnListView;

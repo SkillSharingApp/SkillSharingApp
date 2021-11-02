@@ -2,8 +2,7 @@ import React from "react";
 import {View, Text} from 'react-native';
 
 
-const SetScheduleView = () => {
+export default SetScheduleScreen = ({ route, navigation }) => {
     return <Text>Welcome to SetScheduleView</Text>;
 }
 
-export default SetScheduleView;

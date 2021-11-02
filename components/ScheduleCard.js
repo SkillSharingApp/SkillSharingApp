@@ -1,7 +1,7 @@
 import React from "react";
 import {View, StyleSheet} from 'react-native';
 
-export default LearnListCard = (props) => {
+export default ScheduleCard = (props) => {
     return (
         <View style={styles.card}>
             <View style={styles.cardContent}>

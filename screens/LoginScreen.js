@@ -20,7 +20,7 @@
  } from 'react-native/Libraries/NewAppScreen';
  
  
- const LoginView = ({ navigation }) => {
+ export default LoginScreen = ({ navigation }) => {
    const isDarkMode = useColorScheme() === 'dark';
  
    const backgroundStyle = {
@@ -69,5 +69,4 @@
    },
  });
  
- export default LoginView;
  
