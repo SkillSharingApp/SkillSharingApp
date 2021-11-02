@@ -59,17 +59,10 @@ const SkillType = new GraphQLObjectType({
     name: 'Skill',
     description: 'This represents a single skill of a single user',
     fields: () => ({
-<<<<<<< HEAD
-        id: { type: GraphQLNonNull(GraphQLInt) },
-        teacherId: { type: GraphQLNonNull(GraphQLInt) },
-        skillName: { type: GraphQLNonNull(GraphQLString) },
-        description: { type: GraphQLString },
-=======
         id: { type: GraphQLNonNull(GraphQLID) },
         teacherId: { type: GraphQLNonNull(GraphQLID) },
         skillName: { type: GraphQLNonNull(GraphQLString) },
         skillDescription: { type: GraphQLString },
->>>>>>> f2dc986114e671ea0196e27796da65c57cdc97de
         availability: { type: GraphQLString },
         duration: { type: GraphQLInt },
         overallRating: { type: GraphQLFloat },

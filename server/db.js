@@ -10,7 +10,6 @@ const sequelize = new Sequelize(
         host: 'skillsharedb.cetgdw4b9o0k.us-west-1.rds.amazonaws.com',
         port: '3306',
         dialect: 'mariadb',
-       
     }
 );
 

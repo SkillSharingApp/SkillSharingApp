@@ -6,8 +6,8 @@ import LearnListCard from "../components/LearnListCard";
 const SKILL = gql`
     query singleSkill($id: Int!) {
         singleSkill(id: $id) {
-            name
-            description
+            skillName
+            skillDescription
             teacher {
                 name
                 username
@@ -32,9 +32,9 @@ export default function LearnSkillView({ route, navigation }){
     return (
     <LearnListCard>
         <Text>Welcome to LearnSkillView</Text>
-        <Text>{data.singleSkill.name}</Text>
+        <Text>{data.singleSkill.skillName}</Text>
         <Text>{data.singleSkill.overallRating}</Text>
-        <Text>{data.singleSkill.description}</Text>
+        <Text>{data.singleSkill.skillDescription}</Text>
         <Text>{data.singleSkill.teacher.username}</Text>
         <Text>{data.singleSkill.teacher.name}</Text>
         <Text>{data.singleSkill.duration} minutes</Text>
