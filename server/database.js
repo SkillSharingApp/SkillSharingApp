@@ -3,12 +3,12 @@ const { Sequelize } = require("sequelize");
 let db = {};
 
 const sequelize = new Sequelize(
-    'db-name',
-    'db-user',
-    'db-password',
+    'db-skillsharedb',
+    'Eevee',
+    'ptri3Eevee',
     {
-        host: 'db-host',
-        port: 'db-port',
+        host: 'http://skillsharedb.cetgdw4b9o0k.us-west-1.rds.amazonaws.com',
+        port: '3306',
         dialect: 'mariadb',
         define: {
             timestamps: false
