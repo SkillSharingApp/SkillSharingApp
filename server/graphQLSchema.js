@@ -27,11 +27,12 @@ const UserType = new GraphQLObjectType({
             type: new GraphQLList(SkillType),
             resolve: (user) => {
                 return db.models.SkillsOffered.findAll({ where: { TeacherId: user.id }});
-        },
+        }
+    },
         messages: {
             type: new GraphQLList(MessageType),
             resolve: (user) => {
-                return db.models.Messages.findAll({where: {senderId:user.senderId}});
+                return db.models.Messages.findAll({where: {senderId:user.Id}});
             }
         },
         conversationWith: {
@@ -47,10 +48,15 @@ const UserType = new GraphQLObjectType({
         classes: {
             type: new GraphQLList(ClassType),
             resolve: (user) => {
-                return db.models.Classes.findAll();
+                 let skill = db.models.SkillsOffered.findAll({
+                where: {teacherId:user.id }});
+                return skill.forEach(el=>{
+                    return db.models.Classes.findAll({where:{skillId:skill.teacherId}})
+                })
+                
             }
         }
-    })
+    }),
 });
 
 const SkillType = new GraphQLObjectType({
@@ -68,7 +74,7 @@ const SkillType = new GraphQLObjectType({
         teacher: {
             type: UserType,
             resolve: (skill) => {
-                return db.models.User.findAll({ where: { id: skill.TeacherId } });//(user => user.id === skill.teacherId);
+                return db.models.User.findAll({ where: { id: skill.teacherId } });
             }
         }
     })
@@ -86,7 +92,9 @@ const ClassType = new GraphQLObjectType({
         learner: {
             type: UserType,
             resolve: (item) => {
-                return users.find(user => user.id === item.learnerId);
+                return 
+                users.find(user => user.id === item.learnerId);
+                db.models.User.findAll
             }
         },
         skill: { 
@@ -138,7 +146,6 @@ const SessionType = new GraphQLObjectType({
 })
 
 
-// stephanie :change args in all users 
 
 //queries
 const RootQueryType = new GraphQLObjectType({
@@ -148,47 +155,93 @@ const RootQueryType = new GraphQLObjectType({
         users: {
             type: new GraphQLList(UserType),
             description: 'A list of all users',
-            // args:{
-            //     //args can only be a id with the graphqlint or email/string
-            //     id :{
-            //         type:GraphQLInt
-            //     },
-            //     email:{
-            //         type:GraphQLString
-            //     }
-            // },
-            resolve: (root, args) => db.models.User.findAll()
+            args:{
+                //args can only be a id with the graphqlint or email/string
+                id :{
+                    type:GraphQLID
+                },
+                email:{
+                    type:GraphQLString
+                }
+            },
+            resolve: (root, args) => db.models.User.findAll({where:args})
         },
         skills: {
             type: new GraphQLList(SkillType),
             description: 'A list of all skills of all users',
-            resolve: () => db.models.SkillsOffered.findAll()
+            args:{ 
+                id :{
+                    type:GraphQLID
+                },
+                teacherId:{
+                    type:GraphQLID
+                },
+                skillName:{
+                    type:GraphQLString
+                }
+
+            },
+            resolve: (root ,args) => db.models.SkillsOffered.findAll({where:args})
         },
         classes: {
             type: new GraphQLList(ClassType),
             description: 'A list of all class sessions',
+            args:{ 
+                id :{
+                    type:GraphQLID
+                },
+                skillId:{
+                    type:GraphQLID
+                },
+                learnerId:{
+                    type:GraphQLID
+                }
+
+            },
             resolve: (root, args) => db.models.Classes.findAll({where:args})
         },  
         messages: {
             type: new GraphQLList(MessageType),
             description: 'A list of all messages between users',
+            args:{ 
+                id :{
+                    type:GraphQLID
+                },
+                senderId:{
+                    type:GraphQLID
+                },
+                recipentId:{
+                    type:GraphQLID
+                },timestamp:{
+                    type:GraphQLString
+                }
+
+            },
             resolve: (root, args) => db.models.Messages.findAll({where:args})
         },
         sessions: {
             type: new GraphQLList(SessionType),
             description: 'A list of all active user sessions',
-            resolve: (root, args) => db.models.Messages.Sessions({where:args})
-        },
-        singleSkill: {
-            type: SkillType,
-            description: 'A single skill',
-            args: {
-                id: { type: GraphQLNonNull(GraphQLInt) }
+            args:{
+                token:{ 
+                    type:GraphQLString
+                },
+                userId :{
+                    type:GraphQLID
+                }
             },
-            resolve: (parent, args) => { 
-                return db.models.SkillsOffered.find(skillItem => skillItem.id === args.id);
-            }
-        }
+            resolve: (root, args) => db.models.Sessions.findAll({where:args})
+        },
+        // singleSkill: {
+        //     type: SkillType,
+        //     description: 'A single skill',
+        //     args: {
+        //         id: { type: GraphQLNonNull(GraphQLInt) }
+        //     },
+        //     resolve: (parent, args) => { 
+        //         return db.models.SkillsOffered.find({where:args});
+        //     }
+        //}
 
 
     })
