@@ -7,9 +7,11 @@ const {
     GraphQLFloat,
     GraphQLBoolean
 } = require('graphql');
+const db = require('./db');
+//add db.models
+//stephanie
 
-
-const { users, skills, classes, messages, sessions } = require('./fakeData');
+//const { Users, SkillsOffered, Classes, Messages, Sessions } = require('./db');
 
 const UserType = new GraphQLObjectType({
     name: 'User',
@@ -24,20 +26,20 @@ const UserType = new GraphQLObjectType({
         skills: {
             type: new GraphQLList(SkillType),
             resolve: (user) => {
-                return skills.filter(skill => skill.teacherId === user.id);
+                return db.models.SkillsOffered.filter(skill => skill.TeacherId === user.id);
             }
         },
         messages: {
             type: new GraphQLList(MessageType),
             resolve: (user) => {
-                return messages.filter(message => message.senderId === user.id || message.recipientId === user.id);
+                return Messages.filter(message => message.senderId === user.id || message.recipientId === user.id);
             }
         },
         conversationWith: {
             type: new GraphQLList(MessageType),
             args: { partnerId: { type: GraphQLInt } },
             resolve: (user, args) => {
-                return messages.filter(message => {
+                return Messages.filter(message => {
                     return (message.senderId === args.partnerId 
                             && message.recipientId === user.id) 
                         || (message.senderId === user.id 
@@ -138,6 +140,10 @@ const SessionType = new GraphQLObjectType({
     })
 })
 
+
+// stephanie :change args in all users 
+
+//queries
 const RootQueryType = new GraphQLObjectType({
     name: 'Query',
     description: 'Root Query',
@@ -145,27 +151,36 @@ const RootQueryType = new GraphQLObjectType({
         users: {
             type: new GraphQLList(UserType),
             description: 'A list of all users',
-            resolve: () => users
+            args:{
+                //args can only be a id with the graphqlint or email/string
+                id :{
+                    type:GraphQLInt
+                },
+                email:{
+                    type:GraphQLString
+                }
+            },
+            resolve: (root, args) => db.models.Users.findAll({where:args})
         },
         skills: {
             type: new GraphQLList(SkillType),
             description: 'A list of all skills of all users',
-            resolve: () => skills
+            resolve: (root, args) => db.models.SkillsOffered.findAll({where:args})
         },
         classes: {
             type: new GraphQLList(ClassType),
             description: 'A list of all class sessions',
-            resolve: () => classes
-        },
+            resolve: (root, args) => db.models.Classes.findAll({where:args})
+        },  
         messages: {
             type: new GraphQLList(MessageType),
             description: 'A list of all messages between users',
-            resolve: () => messages
+            resolve: (root, args) => db.models.Messages.findAll({where:args})
         },
         sessions: {
             type: new GraphQLList(SessionType),
             description: 'A list of all active user sessions',
-            resolve: () => sessions
+            resolve: (root, args) => db.models.Messages.Sessions({where:args})
         },
         singleSkill: {
             type: SkillType,
@@ -174,11 +189,15 @@ const RootQueryType = new GraphQLObjectType({
                 id: { type: GraphQLNonNull(GraphQLInt) }
             },
             resolve: (parent, args) => { 
-                return skills.find(skillItem => skillItem.id === args.id);
+                return db.models.SkillsOffered.find(skillItem => skillItem.id === args.id);
             }
         }
+
+
     })
 });
+
+//
 
 const RootMutationType = new GraphQLObjectType({
     name: 'Mutation',

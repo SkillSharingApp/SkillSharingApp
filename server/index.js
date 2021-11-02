@@ -1,7 +1,9 @@
 const express = require('express');
-const { graphqlHTTP } = require('express-graphql');
-const { GraphQLSchema } = require('graphql');
+const  graphqlHTTP = require('express-graphql');
+const  GraphQLSchema = require('graphql');
 const { ApolloServer } = require('apollo-server-express');
+// const { typeDefs } = require("./schema/type-defs");
+// const { resolvers } = require("./schema/resolvers");
 
 //const { RootQueryType, RootMutationType } = require('./graphQLSchema');
 

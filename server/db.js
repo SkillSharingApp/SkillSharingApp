@@ -180,7 +180,7 @@ sequelize.sync({force:true}).then(()=>{
         });
     });
     }).catch(function(e) {
-        console.log(`line176 ${e}`); 
+        console.log(`server/db,js line 176 ${e}`); 
 })
 
 module.exports = sequelize
