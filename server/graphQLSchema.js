@@ -31,7 +31,7 @@ const UserType = new GraphQLObjectType({
         messages: {
             type: new GraphQLList(MessageType),
             resolve: (user) => {
-                return db.models.Messages.filter(message => message.senderId === user.id || message.recipientId === user.id);
+                return db.models.Messages.findAll();
             }
         },
         conversationWith: {
