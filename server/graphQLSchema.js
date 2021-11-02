@@ -36,7 +36,7 @@ const UserType = new GraphQLObjectType({
         },
         conversationWith: {
             type: new GraphQLList(MessageType),
-            args: { partnerId: { type: GraphQLInt } },
+            args: { partnerId: { type: GraphQLID } },
             resolve: (user, args) => {
                 return db.models.Messages.filter(message => {
                     return (message.senderId === args.partnerId 
@@ -44,6 +44,33 @@ const UserType = new GraphQLObjectType({
                         || (message.senderId === user.id 
                              && message.recipientId === args.partnerId);
                 });
+            }
+        },
+        conversationsList: {
+            type: new GraphQLList(UserType),
+            args: { userId: { type: GraphQLID } },
+            resolve: (user, args) => {
+                const list = [];
+                list.concat(db.models.Messages.findAll({ where: { senderId: user.Id } }).map(message => {
+                   return db.models.User.findAll({ where: { id: message.recipientId }})
+                }));
+                list.concat(db.models.Messages.findAll({ where: { recipientId: user.Id }}).map(message => {
+                    return db.models.User.findAll({ where: { id: message.senderId }})
+                }));
+                const set = new Set(list);
+                const list2 = [];
+                set.forEach((value) => {
+                    list2.push(value);
+                });
+                return list2;
+            }
+        },
+        mostRecentMessageInConversationWith: {
+            type: MessageType,
+            args: { partnerId: { type: GraphQLID } },
+            resolve: (user, args) => {
+                return db.models.Messages.findAll({ where: { [Op.and]: [{[Op.or]: [{recipientId: user.id, recipientId: args.partnerId }] }, {[Op.or]: [{senderId: user.id}, {senderId: args.partnerId}]}] },
+                                                    order: sequelize.literal('max(age) DESC')})[0];
             }
         },
         classes: {
@@ -185,14 +212,22 @@ const RootQueryType = new GraphQLObjectType({
             type: SkillType,
             description: 'A single skill',
             args: {
-                id: { type: GraphQLNonNull(GraphQLInt) }
+                id: { type: GraphQLNonNull(GraphQLID) }
             },
             resolve: (parent, args) => { 
                 return db.models.SkillsOffered.find(skillItem => skillItem.id === args.id);
             }
+        },
+        singleUser: {
+            type: UserType,
+            description: 'A single user',
+            args: {
+                id: { type: GraphQLNonNull(GraphQLID) }
+            },
+            resolve: (parent, args) => {
+                return db.models.User.findAll({ where: { id: args.id } });
+            }
         }
-
-
     })
 });
 

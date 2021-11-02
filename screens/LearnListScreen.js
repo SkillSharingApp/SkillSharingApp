@@ -9,21 +9,13 @@ const SKILLS = gql`
         skills {
             id
             skillName
+            teacher {
+                username
+            }
             overallRating
         }
     }
     `;
-// query should be this once skills -> teacher resolver is rewritten
-    // query {
-    //     skills {
-    //         id
-    //         skillName
-    //         teacher {
-    //             username
-    //         }
-    //         overallRating
-    //     }
-    // }
 
 export default  LearnListScreen = ({ route, navigation }) => {
     const {id, name} = route.params 
@@ -42,7 +34,7 @@ export default  LearnListScreen = ({ route, navigation }) => {
                     <TouchableOpacity onPress={()=> navigation.navigate('LearnSkill', item.id)}>
                         <LearnListCard>
                             <Text>{ item.skillName }</Text>
-                            {/* <Text>taught by: { item.teacher.username }</Text> */}
+                            <Text>taught by: { item.teacher.username }</Text>
                             <Text>rating: { item.overallRating }</Text>
                         </LearnListCard>
                     </TouchableOpacity>

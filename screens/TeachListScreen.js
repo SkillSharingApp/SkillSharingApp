@@ -1,21 +1,33 @@
 import React, { useState, useEffect }from "react";
 import {View, Text} from 'react-native';
+import { useQuery, gql } from "@apollo/client";
 
+const USER_SKILLS = gql`
+    query singleUser($id: ID!) {
+        singleUser(id: $id) {
+            skills {
+                id
+                skillName
+                overallRating
+            }
+        }
+    }
+    `;
 
 export default TeachListScreen = ({ route, navigation }) => {
     const { id } = route.params;
-    const [classArray, setClassArray] = useState([]);
 
-    //on load of screen
-    useEffect(()=>{
-        //fetch all classes taught by user with matching id
+    const { loading, error, data } = useQuery(USER_SKILLS, { 
+        variables: { id }
+    });
 
-        //setClassArray(fetchedClasses);
-    }, [])
+    if (loading) return <Text>Loading...</Text>;
+    if (error) return <Text>Error {JSON.stringify(error)}</Text>;
 
 
     return (
         <Text>Welcome to TeachListView</Text>
+
     ) 
 }
 
