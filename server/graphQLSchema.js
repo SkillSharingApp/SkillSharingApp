@@ -5,19 +5,18 @@ const {
     GraphQLNonNull,
     GraphQLInt,
     GraphQLFloat,
-    GraphQLBoolean
+    GraphQLBoolean,
+    GraphQLID,
 } = require('graphql');
 const db = require('./db');
 //add db.models
 //stephanie
 
-//const { Users, SkillsOffered, Classes, Messages, Sessions } = require('./db');
-
 const UserType = new GraphQLObjectType({
     name: 'User',
     description: 'This represents a sigle user',
     fields: () => ({
-        id: { type: GraphQLNonNull(GraphQLInt) },
+        id: { type: GraphQLNonNull(GraphQLID) },
         name: { type: GraphQLNonNull(GraphQLString) },
         username: { type: GraphQLNonNull(GraphQLString) },
         email: { type: GraphQLNonNull(GraphQLString) },
@@ -26,20 +25,20 @@ const UserType = new GraphQLObjectType({
         skills: {
             type: new GraphQLList(SkillType),
             resolve: (user) => {
-                return db.models.SkillsOffered.filter(skill => skill.TeacherId === user.id);
+                return db.models.SkillsOffered.findAll({ where: { TeacherId: user.id }});//filter(skill => skill.TeacherId === user.id);
             }
         },
         messages: {
             type: new GraphQLList(MessageType),
             resolve: (user) => {
-                return Messages.filter(message => message.senderId === user.id || message.recipientId === user.id);
+                return db.models.Messages.findAll();
             }
         },
         conversationWith: {
             type: new GraphQLList(MessageType),
             args: { partnerId: { type: GraphQLInt } },
             resolve: (user, args) => {
-                return Messages.filter(message => {
+                return db.models.Messages.filter(message => {
                     return (message.senderId === args.partnerId 
                             && message.recipientId === user.id) 
                         || (message.senderId === user.id 
@@ -50,7 +49,7 @@ const UserType = new GraphQLObjectType({
         classes: {
             type: new GraphQLList(ClassType),
             resolve: (user) => {
-                return classes.filter(item => item.learner === user.id);
+                return db.models.Classes.filter(item => item.learner === user.id);
             }
         }
     })
@@ -60,10 +59,17 @@ const SkillType = new GraphQLObjectType({
     name: 'Skill',
     description: 'This represents a single skill of a single user',
     fields: () => ({
+<<<<<<< HEAD
         id: { type: GraphQLNonNull(GraphQLInt) },
         teacherId: { type: GraphQLNonNull(GraphQLInt) },
         skillName: { type: GraphQLNonNull(GraphQLString) },
         description: { type: GraphQLString },
+=======
+        id: { type: GraphQLNonNull(GraphQLID) },
+        teacherId: { type: GraphQLNonNull(GraphQLID) },
+        skillName: { type: GraphQLNonNull(GraphQLString) },
+        skillDescription: { type: GraphQLString },
+>>>>>>> f2dc986114e671ea0196e27796da65c57cdc97de
         availability: { type: GraphQLString },
         duration: { type: GraphQLInt },
         overallRating: { type: GraphQLFloat },
@@ -71,7 +77,7 @@ const SkillType = new GraphQLObjectType({
         teacher: {
             type: UserType,
             resolve: (skill) => {
-                return users.find(user => user.id === skill.teacherId);
+                return db.models.User.findAll({ where: { id: skill.TeacherId } });//(user => user.id === skill.teacherId);
             }
         }
     })
@@ -81,10 +87,10 @@ const ClassType = new GraphQLObjectType({
     name: 'Class',
     description: 'This represents a single class session that is requested, scheduled, or attended',
     fields: () => ({
-        id: { type: GraphQLNonNull(GraphQLInt) },
-        skillId: { type: GraphQLNonNull(GraphQLInt) },
+        id: { type: GraphQLNonNull(GraphQLID) },
+        skillId: { type: GraphQLNonNull(GraphQLID) },
         confirmed: { type: GraphQLNonNull(GraphQLBoolean) },
-        learnerId: { type: GraphQLNonNull(GraphQLInt) },
+        learnerId: { type: GraphQLNonNull(GraphQLID) },
         attended: { type: GraphQLNonNull(GraphQLBoolean) },
         learner: {
             type: UserType,
@@ -105,9 +111,9 @@ const MessageType = new GraphQLObjectType({
     name: 'Message',
     description: 'This represents a single message between two users',
     fields: () => ({
-        id: { type: GraphQLNonNull(GraphQLInt) },
-        senderId: { type: GraphQLNonNull(GraphQLInt) },
-        recipientId: { type: GraphQLNonNull(GraphQLInt) },
+        id: { type: GraphQLNonNull(GraphQLID) },
+        senderId: { type: GraphQLNonNull(GraphQLID) },
+        recipientId: { type: GraphQLNonNull(GraphQLID) },
         content: { type: GraphQLString },
         timestamp: { type: GraphQLString },
         sender: {
@@ -130,7 +136,7 @@ const SessionType = new GraphQLObjectType({
     description: 'This represents a single session of a single user',
     fields: () => ({
         token: { type: GraphQLNonNull(GraphQLString) },
-        userId: { type: GraphQLNonNull(GraphQLInt) },
+        userId: { type: GraphQLNonNull(GraphQLID) },
         user: { 
             type: UserType,
             resolve: (session) => {
@@ -151,21 +157,21 @@ const RootQueryType = new GraphQLObjectType({
         users: {
             type: new GraphQLList(UserType),
             description: 'A list of all users',
-            args:{
-                //args can only be a id with the graphqlint or email/string
-                id :{
-                    type:GraphQLInt
-                },
-                email:{
-                    type:GraphQLString
-                }
-            },
-            resolve: (root, args) => db.models.Users.findAll({where:args})
+            // args:{
+            //     //args can only be a id with the graphqlint or email/string
+            //     id :{
+            //         type:GraphQLInt
+            //     },
+            //     email:{
+            //         type:GraphQLString
+            //     }
+            // },
+            resolve: (root, args) => db.models.User.findAll()
         },
         skills: {
             type: new GraphQLList(SkillType),
             description: 'A list of all skills of all users',
-            resolve: (root, args) => db.models.SkillsOffered.findAll({where:args})
+            resolve: () => db.models.SkillsOffered.findAll()
         },
         classes: {
             type: new GraphQLList(ClassType),
@@ -214,7 +220,6 @@ const RootMutationType = new GraphQLObjectType({
             },
             resolve: (parent, args) => {
                 const user = { 
-                    id: users.length + 1, 
                     name: args.name,
                     username: args.username,
                     email: args.email,
@@ -229,15 +234,14 @@ const RootMutationType = new GraphQLObjectType({
             type: SkillType,
             description: 'Add a skill offered by a user',
             args: {
-                teacherId: { type: GraphQLNonNull(GraphQLInt) },
+                teacherId: { type: GraphQLNonNull(GraphQLID) },
                 name: { type: GraphQLNonNull(GraphQLString) },
                 description: { type: GraphQLString },
                 availability: { type: GraphQLString },
                 duration: { type: GraphQLInt }
             },
             resolve: (parent, args) => {
-                const skill = { 
-                    id: skills.length + 1, 
+                const skill = {  
                     teacherId: args.teacherId, 
                     name: args.name,
                     description: args.description ? args.description : '',
@@ -254,7 +258,7 @@ const RootMutationType = new GraphQLObjectType({
             type: SkillType,
             description: 'Update a skill, excepting ratings fields',
             args: {
-                id: { type: GraphQLNonNull(GraphQLInt) },
+                id: { type: GraphQLNonNull(GraphQLID) },
                 name: { type: GraphQLString },
                 description: { type: GraphQLString },
                 availability: { type: GraphQLString },
@@ -273,7 +277,7 @@ const RootMutationType = new GraphQLObjectType({
             type: SkillType,
             description: 'Delete a skill',
             args: {
-                id: { type: GraphQLNonNull(GraphQLInt) }
+                id: { type: GraphQLNonNull(GraphQLID) }
             },
             resolve: (parent, args) => {
                 return skills.splice(args.id - 1, 1)[0]; 
@@ -283,8 +287,8 @@ const RootMutationType = new GraphQLObjectType({
             type: ClassType,
             description: 'Add a class session',
             args: {
-                skillId: { type: GraphQLNonNull(GraphQLInt) },
-                learnerId: { type: GraphQLNonNull(GraphQLInt) }
+                skillId: { type: GraphQLNonNull(GraphQLID) },
+                learnerId: { type: GraphQLNonNull(GraphQLID) }
             },
             resolve: (parent, args) => {
                 const classItem = {
@@ -302,7 +306,7 @@ const RootMutationType = new GraphQLObjectType({
             type: ClassType,
             description: 'Update a class session',
             args: {
-                id: { type: GraphQLNonNull(GraphQLInt) },
+                id: { type: GraphQLNonNull(GraphQLID) },
                 confirmed: { type: GraphQLBoolean },
                 attended: { type: GraphQLBoolean }
             },
@@ -319,7 +323,7 @@ const RootMutationType = new GraphQLObjectType({
             type: ClassType,
             description: 'Delete a class session',
             args: {
-                id: { type: GraphQLNonNull(GraphQLInt) }
+                id: { type: GraphQLNonNull(GraphQLID) }
             },
             resolve: (parent, args) => {
                 return classes.splice(args.id - 1, 1)[0];
@@ -329,8 +333,8 @@ const RootMutationType = new GraphQLObjectType({
             type: MessageType,
             description: 'Add a single message',
             args: {
-                senderId: { type: GraphQLNonNull(GraphQLInt) },
-                recipientId: { type: GraphQLNonNull(GraphQLInt) },
+                senderId: { type: GraphQLNonNull(GraphQLID) },
+                recipientId: { type: GraphQLNonNull(GraphQLID) },
                 content: { type: GraphQLNonNull(GraphQLString) }
             },
             resolve: (parent, args) => {
@@ -350,7 +354,7 @@ const RootMutationType = new GraphQLObjectType({
             description: 'Add a single active user session',
             args: {
                 token: { type: GraphQLNonNull(GraphQLString) },
-                userId: { type: GraphQLNonNull(GraphQLInt) }
+                userId: { type: GraphQLNonNull(GraphQLID) }
             },
             resolve: (parent, args) => {
                 const session = {
