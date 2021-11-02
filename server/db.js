@@ -15,7 +15,7 @@ const sequelize = new Sequelize(
 );
 
 const User = sequelize.define('User', {
-    uuid: {
+    id: {
         type: Sequelize.UUID,
         defaultValue:Sequelize.UUIDV4,
         primaryKey: true
@@ -49,7 +49,7 @@ const User = sequelize.define('User', {
 });
 
 const Classes = sequelize.define('Classes',{
-    uuid: {
+    id: {
         type: Sequelize.UUID,
         defaultValue:Sequelize.UUIDV4,
         primaryKey: true
@@ -87,7 +87,7 @@ const Sessions = sequelize.define('Sessions',{
         type: Sequelize.UUID,
         references: {
             model: User,
-            key: 'uuid',
+            key: 'id',
             deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
         },
     },
@@ -96,7 +96,7 @@ const Sessions = sequelize.define('Sessions',{
     },
 });
 const Messages = sequelize.define('Messages',{
-    uuid: {
+    id: {
         type: Sequelize.UUID,
         defaultValue:Sequelize.UUIDV4,
         primaryKey: true
@@ -105,7 +105,7 @@ const Messages = sequelize.define('Messages',{
         type: Sequelize.UUID,
         references: {
             model: User,
-            key: 'uuid',
+            key: 'id',
             deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
         },
     },
@@ -123,7 +123,7 @@ const Messages = sequelize.define('Messages',{
     },
 });
 const SkillsOffered = sequelize.define('SkillsOffered',{
-    uuid: {
+    id: {
         type: Sequelize.UUID,
         defaultValue:Sequelize.UUIDV4,
         primaryKey: true
@@ -143,7 +143,7 @@ const SkillsOffered = sequelize.define('SkillsOffered',{
         type: Sequelize.UUID,
         references: {
             model: User,
-            key: 'uuid',
+            key: 'id',
             deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
           },
 
@@ -168,19 +168,25 @@ Messages.belongsTo(User);
 User.hasMany(SkillsOffered);
 SkillsOffered.belongsTo(User);
 
+// sequelize.sync({force:true}).then(()=>{
+//     _.times(4,()=>{
+//         return User.create({
+//             name:Faker.name.firstName(),
+//             username:Faker.internet.userName(),
+//             email:Faker.internet.email(),
+//             password:Faker.internet.password(),
 
-sequelize.sync({force:true}).then(()=>{
-    _.times(4,()=>{
-        return User.create({
-            name:Faker.name.firstName(),
-            username:Faker.internet.userName(),
-            email:Faker.internet.email(),
-            password:Faker.internet.password(),
+//         });
+//     });
+//     }).catch(function(e) {
+//         console.log(`server/db,js line 176 ${e}`); 
+//})
+// sequelize.sync({force:true}).then(()=>{
 
-        });
-    });
-    }).catch(function(e) {
-        console.log(`server/db,js line 176 ${e}`); 
-})
+//         let conn = User.findAll();
+//         console.log(conn)
+//     }).catch(function(e) {
+//         console.log(`server/db,js line 176 ${e}`); 
+// })
 
 module.exports = sequelize
