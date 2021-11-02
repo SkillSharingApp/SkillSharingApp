@@ -62,7 +62,7 @@ const SkillType = new GraphQLObjectType({
     fields: () => ({
         id: { type: GraphQLNonNull(GraphQLInt) },
         teacherId: { type: GraphQLNonNull(GraphQLInt) },
-        name: { type: GraphQLNonNull(GraphQLString) },
+        skillName: { type: GraphQLNonNull(GraphQLString) },
         description: { type: GraphQLString },
         availability: { type: GraphQLString },
         duration: { type: GraphQLInt },
