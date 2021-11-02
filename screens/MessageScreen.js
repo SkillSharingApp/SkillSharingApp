@@ -1,8 +1,26 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { GiftedChat } from 'react-native-gifted-chat'
+import { Button, View, Keyboard, Text } from 'react-native';
 
-export default MessageScreen =() => {
+export default MessageScreen =({ route, navigation }) => {
+  // const {id} = route.params;
   const [messages, setMessages] = useState([]);
+  const [keyboardStatus, setKeyboardStatus] = useState(undefined);
+
+  //keyboard listener to handle conditional button rendering
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardStatus(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardStatus(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   //upon page load we can fetch any messages between user/teacher and prepopulate them here.
   useEffect(() => {
@@ -22,7 +40,7 @@ export default MessageScreen =() => {
         text: 'message #2',
         createdAt: new Date(),
         user: {
-          _id: 2,
+          _id: 3,
           name: 'TestUser',
           avatar: 'https://cdn.shopify.com/s/files/1/0052/6198/3830/products/The-General-Poster_1100x.jpg?v=1587118245',
         },
@@ -32,7 +50,7 @@ export default MessageScreen =() => {
         text: 'Here\'s a message that was sent before',
         createdAt: new Date(),
         user: {
-          _id: 1,
+          _id: 2,
           name: 'TestUser',
           avatar: 'https://cdn.shopify.com/s/files/1/0052/6198/3830/products/The-General-Poster_1100x.jpg?v=1587118245',
         },
@@ -48,12 +66,24 @@ export default MessageScreen =() => {
   }, [])
 
   return (
+    <View style={{ flex: 1 }}> 
+      
     <GiftedChat
       messages={messages}
       onSend={messages => onSend(messages)}
       user={{
-        _id: 1,
+        //we can render this component, passing in the current user ID here to ensure self-messages render in blue
+        _id: 3,
       }}
     />
+
+    {/*conditional render of the buttons, dependent on Keyboard State*/}
+
+    {!keyboardStatus? 
+      <View>
+        <Button title="Catz"/>
+        <Button title="LIME GUY!"/>
+      </View> :null}
+    </View>
   )
 }

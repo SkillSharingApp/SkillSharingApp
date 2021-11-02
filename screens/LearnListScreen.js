@@ -4,7 +4,8 @@ import LearnListCard from "../components/LearnListCard";
 
 
 
-export default  LearnListScreen = ({ navigation }) => {
+export default  LearnListScreen = ({ route, navigation }) => {
+    const {id, name} = route.params 
 
     const dummyClasses =[{
        skill: 'Kendo',
@@ -28,18 +29,19 @@ export default  LearnListScreen = ({ navigation }) => {
      }];
 
     //initialize classesToRender with dummy data...remove when fetching
-    const [classesToRender, setClassesToRender] = useState(dummyClasses);
+    const [classesToRender, setClassesToRender] = useState([]);
 
     
     //componentDidMountHook (put fetch of skills here)
     useEffect(()=>{
-        //fetch skils
+        //fetch skills
         //setClassesToRender using fetched data;
+        setClassesToRender(dummyClasses);
     }, [])
 
     return (
         <View> 
-            <Text>Welcome to LearnListView</Text>
+            <Text>What do you wanna learn {name}?</Text>
             <FlatList
                 data={dummyClasses}
                 renderItem={({ item }) => (
