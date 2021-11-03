@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import PipView from './components/PipView';
 
 
 import {
@@ -19,16 +20,21 @@ import {
   mediaDevices,
   registerGlobals
 } from 'react-native-webrtc';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 const props = {
-
+  isInstructor: true,
+  classId: 1
 };
 
 const App = (props) => {
   // set instructorStream and studentStream states and handlers
   const [instructorStream, setInstructorStream] = useState(null);
   const [studentStream, setStudentStream] = useState(null);
+  const [mirror, setMirror] = useState(false);
+
+  const mirrorPress = () => {
+    if (props.isInstructor) setMirror(!mirror);
+  }
 
   // functions to start and stop instructor stream
   const startInstructorStream = async () => {
@@ -65,12 +71,14 @@ const App = (props) => {
     alignItems: 'center',
     backgroundColor: 'skyblue'
     }}>
-    {instructorStream ? <RTCView streamURL = {instructorStream.toURL()} style={styles.stream} />
-     : <Text style={{color: "black"}}>Waiting for connection...</Text>}
+    {!instructorStream && <Text style={{color: "black"}}>Waiting for connection...</Text>}
+    {instructorStream && <RTCView streamURL = {instructorStream.toURL()} style={styles.instructorStream} key={'instructorView'} />}
+    <PipView stream = {studentStream} />
     </View>
     <View>
-      <Button title = "Start" onPress = {startInstructorStream} />
-      <Button title = "Stop" onPress = {stopInstructorStream} /> 
+      <Button title = 'Mirror' onPress = {mirrorPress} />
+      <Button title = 'Start' onPress = {startInstructorStream} />
+      <Button title = 'Stop' onPress = {stopInstructorStream} /> 
     </View>
   </View>
   );
@@ -81,9 +89,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
     ...StyleSheet.absoluteFill
   },
-  stream: {
+  instructorStream: {
     flex: 1,
-    height: '100%'
+    height: '100%',
+    mirror: false,
+    zOrder: 5
   },
   footer: {
     backgroundColor: 'lightgray',
