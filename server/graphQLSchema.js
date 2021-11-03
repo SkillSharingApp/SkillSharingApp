@@ -50,23 +50,12 @@ const UserType = new GraphQLObjectType({
         },
         conversationWith: {
             type: new GraphQLList(MessageType),
-<<<<<<< HEAD
-            args: { partnerId: { type: GraphQLID } },
-            resolve: (user, args) => {
-                return db.models.Messages.filter(message => {
-                    return (message.senderId === args.partnerId 
-                            && message.recipientId === user.id) 
-                        || (message.senderId === user.id 
-                             && message.recipientId === args.partnerId);
-                });
-=======
             args: { partnerId: { type: GraphQLInt } },
             resolve: (user) => {
                 return db.models.Messages.findAll({where :{
                     senderId:user.id,
                     recipentId: user.recipentId 
                 } });
->>>>>>> 69b40fe1e82d3f5c9f3db0ace7045163547a912f
             }
         },
         conversationsList: {
@@ -277,30 +266,6 @@ const RootQueryType = new GraphQLObjectType({
         sessions: {
             type: new GraphQLList(SessionType),
             description: 'A list of all active user sessions',
-<<<<<<< HEAD
-            resolve: (root, args) => db.models.Messages.Sessions({where:args})
-        },
-        singleSkill: {
-            type: SkillType,
-            description: 'A single skill',
-            args: {
-                id: { type: GraphQLNonNull(GraphQLID) }
-            },
-            resolve: (parent, args) => { 
-                return db.models.SkillsOffered.find(skillItem => skillItem.id === args.id);
-            }
-        },
-        singleUser: {
-            type: UserType,
-            description: 'A single user',
-            args: {
-                id: { type: GraphQLNonNull(GraphQLID) }
-            },
-            resolve: (parent, args) => {
-                return db.models.User.findAll({ where: { id: args.id } });
-            }
-        }
-=======
             args:{
                 token:{ 
                     type:GraphQLString
@@ -323,7 +288,6 @@ const RootQueryType = new GraphQLObjectType({
         //}
 
 
->>>>>>> 69b40fe1e82d3f5c9f3db0ace7045163547a912f
     })
 });
 
