@@ -6,22 +6,6 @@ const { RootQueryType, RootMutationType } = require('./graphQLSchema');
 
 const app = express();
 
-//const server = new ApolloServer({typeDefs, resolvers})
-
-//server.applyMiddleware({ app });
-
-
-// const launchServer = async () => {
-    
-//     const server = new ApolloServer({
-//         modules: [require('./graphql/users')]
-//     });
-
-//     await server.start();
-//     server.applyMiddleware({ app });
-// }
-
-//launchServer();
 
 const schema = new GraphQLSchema({
     query: RootQueryType,

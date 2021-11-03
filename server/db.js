@@ -107,7 +107,7 @@ const Messages = sequelize.define('Messages',{
             deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
         },
     },
-    recipentId:{
+    recipientId:{
         type: Sequelize.UUID,
         allowNull: false
     },
@@ -115,8 +115,8 @@ const Messages = sequelize.define('Messages',{
         type: Sequelize.STRING
     },
     timestamp:{
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
+        type: Sequelize.STRING,
+        defaultValue: JSON.stringify(new Date())
 
     },
 });
@@ -134,7 +134,7 @@ const SkillsOffered = sequelize.define('SkillsOffered',{
         type: Sequelize.STRING
     },
     duration:{
-        type: Sequelize.TIME,
+        type: Sequelize.INTEGER,
         allowNull: false
     },
     teacherId:{
