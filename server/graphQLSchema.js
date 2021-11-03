@@ -9,6 +9,8 @@ const {
     GraphQLBoolean,
     GraphQLID,
 } = require('graphql');
+const { Sequelize } = require("sequelize");
+const Op = Sequelize.Op;
 const db = require('./db');
 
 const UserType = new GraphQLObjectType({
@@ -16,10 +18,7 @@ const UserType = new GraphQLObjectType({
     description: 'This represents a sigle user',
     fields: () =>{
         return {
-        id: { 
-            type: GraphQLNonNull(GraphQLID), 
-            resolve: (user)=>{return user.id}
-        },
+        id: {  type: GraphQLNonNull(GraphQLID)        },
         firstName: { type: GraphQLNonNull(GraphQLString),
             resolve: (user)=>{return user.firstName} 
         },
@@ -38,24 +37,23 @@ const UserType = new GraphQLObjectType({
         creditBalance: { type: GraphQLNonNull(GraphQLInt) },
         skills: {
             type: new GraphQLList(SkillType),
-            resolve: (user) => {
-                return db.models.SkillsOffered.findAll({ where: { TeacherId: user.id }});
-        }
-    },
+            resolve: async (user) => {
+                return await db.models.SkillsOffered.findAll({ where: { TeacherId: user.id }});
+            }
+        },
         messages: {
             type: new GraphQLList(MessageType),
-            resolve: (user) => {
-                return db.models.Messages.findAll({where: {senderId:user.Id}});
+            resolve: async (user) => {
+                return await db.models.Messages.findAll({where: {[Op.or]: [{senderId:user.Id}, {recipientId: user.id}]}});
             }
         },
         conversationWith: {
             type: new GraphQLList(MessageType),
             args: { partnerId: { type: GraphQLInt } },
-            resolve: (user) => {
-                return db.models.Messages.findAll({where :{
-                    senderId:user.id,
-                    recipentId: user.recipentId 
-                } });
+            resolve: async (user) => {
+                return await db.models.Messages.findAll({where:
+                    {[Op.or]: [{senderId: user.id, recipentId: args.partnerId },
+                               {senderId: args.partnerId, recipientId: user.id }]}});
             }
         },
         conversationsList: {
@@ -63,7 +61,7 @@ const UserType = new GraphQLObjectType({
             args: { userId: { type: GraphQLID } },
             resolve: (user, args) => {
                 const list = [];
-                list.concat(db.models.Messages.findAll({ where: { senderId: user.Id } }).map(message => {
+                list.concat(db.models.Messages.findAll({ where: {senderId: user.Id } }).map(message => {
                    return db.models.User.findAll({ where: { id: message.recipientId }})
                 }));
                 list.concat(db.models.Messages.findAll({ where: { recipientId: user.Id }}).map(message => {
@@ -80,20 +78,22 @@ const UserType = new GraphQLObjectType({
         mostRecentMessageInConversationWith: {
             type: MessageType,
             args: { partnerId: { type: GraphQLID } },
-            resolve: (user, args) => {
-                return db.models.Messages.findAll({ where: { [Op.and]: [{[Op.or]: [{recipientId: user.id, recipientId: args.partnerId }] }, {[Op.or]: [{senderId: user.id}, {senderId: args.partnerId}]}] },
-                                                    order: sequelize.literal('max(age) DESC')})[0];
+            resolve: async (user, args) => {
+                const messageArray = await db.models.Messages.findAll({ where: {[Op.or]: [{recipentId: user.id}, {recipentId: args.partnerId }], [Op.or]: [{senderId: user.id}, {senderId: args.partnerId}]},
+                                                                        order: Sequelize.literal('max(timestamp) DESC')});
+                return messageArray[0];
             }
         },
-        classes: {
+        scheduledClasses: {
             type: new GraphQLList(ClassType),
-            resolve: (user) => {
-                 let skill = db.models.SkillsOffered.findAll({
-                where: {teacherId:user.id }});
-                return skill.forEach(el=>{
-                    return db.models.Classes.findAll({where:{skillId:skill.teacherId}})
-                })
-                
+            resolve: async (user) => {
+                const skillsTeaching = await db.models.Skills.findAll({where: {TeacherId: user.id}});
+                const classesArray = await db.models.Classes.findAll({where: {learnerId: user.id}});
+                skillsTeaching.forEach(async (skill) => {
+                    const classesTeachingArray = await db.models.Classes.findAll({where: {skillId: skill.id}});
+                    classesArray.concat(classesTeachingArray);
+                });
+                return classesArray;
             }
         }
       }
@@ -114,8 +114,9 @@ const SkillType = new GraphQLObjectType({
         numberOfRatings: { type: GraphQLNonNull(GraphQLInt) },
         teacher: {
             type: UserType,
-            resolve: (skill) => {
-                return db.models.User.findAll({ where: { id: skill.teacherId } });
+            resolve: async (skill) => {
+                const teach = await db.models.User.findAll({ where: { id: skill.teacherId } });
+                return teach[0];
             }
         }
     })
@@ -132,17 +133,18 @@ const ClassType = new GraphQLObjectType({
         attended: { type: GraphQLNonNull(GraphQLBoolean) },
         learner: {
             type: UserType,
-            resolve: (item) => {
-                return db.models.User.findAll({where:{id: item.learnerId}})
+            resolve: async (item) => {
+                const student = await db.models.User.findAll({where:{id: item.learnerId}});
+                return student[0];
             }
         },
         skill: { 
             type: SkillType,
-            resolve: (classItem) => {
-                return db.models.SkillsOffered.find({where:{
-                    skillId:classItem.skillId
-                }});
-        }
+            resolve: async (classItem) => {
+                const skillArray = await db.models.SkillsOffered.findAll({where: {id: classItem.skillId }});
+                console.log(skillArray[0]);
+                return skillArray[0];
+            }
         },
     }),
 });
@@ -153,21 +155,21 @@ const MessageType = new GraphQLObjectType({
     fields: () => ({
         id: { type: GraphQLNonNull(GraphQLID) },
         senderId: { type: GraphQLNonNull(GraphQLID) },
-        recipientId: { type: GraphQLNonNull(GraphQLID) },
+        recipientId: { type: GraphQLNonNull(GraphQLID), resolve: (message) => message.recipentId },
         content: { type: GraphQLString },
         timestamp: { type: GraphQLString },
         sender: {
             type: UserType,
-            resolve: (message) => {
-                return db.models.User.find({where :{id:message.senderId}})
-                //users.find(user => user.id === message.senderId);
+            resolve: async (message) => {
+                const senderArray = await db.models.User.findAll({where :{id: message.senderId}})
+                return senderArray[0];
             }
         },
         recipient: {
             type: UserType,
-            resolve: (message) => {
-                return db.models.User.find({where :{id:message.senderId}})
-                //users.find(user => user.id === message.recipientId);
+            resolve: async (message) => {
+                const recipientArray = await db.models.User.findAll({where :{id: message.recipientId}})
+                return recipientArray[0];
             }
         }
     })
@@ -181,9 +183,9 @@ const SessionType = new GraphQLObjectType({
         userId: { type: GraphQLNonNull(GraphQLID) },
         user: { 
             type: UserType,
-            resolve: (session) => {
-                return db.models.User.find({where :{id: session.userId}})
-                //users.find(user => user.id === session.userId);
+            resolve: async (session) => {
+                const userArray = await db.models.User.findAll({where :{id: session.userId}});
+                return userArray[0];
             }
         }
     })
@@ -199,95 +201,72 @@ const RootQueryType = new GraphQLObjectType({
         users: {
             type: new GraphQLList(UserType),
             description: 'A list of all users',
-            args:{
-                //args can only be a id with the graphqlint or email/string
-                id :{
-                    type:GraphQLID
-                },
-                email:{
-                    type:GraphQLString
-                }
-            },
-            resolve: (root, args) => db.models.User.findAll({where:args})
+            resolve: (root, args) => db.models.User.findAll()
         },
         skills: {
             type: new GraphQLList(SkillType),
             description: 'A list of all skills of all users',
-            args:{ 
-                id :{
-                    type:GraphQLID
-                },
-                teacherId:{
-                    type:GraphQLID
-                },
-                skillName:{
-                    type:GraphQLString
-                }
-
-            },
-            resolve: (root ,args) => db.models.SkillsOffered.findAll({where:args})
+            resolve: () => db.models.SkillsOffered.findAll()
         },
         classes: {
             type: new GraphQLList(ClassType),
             description: 'A list of all class sessions',
-            args:{ 
-                id :{
-                    type:GraphQLID
-                },
-                skillId:{
-                    type:GraphQLID
-                },
-                learnerId:{
-                    type:GraphQLID
-                }
-
-            },
-            resolve: (root, args) => db.models.Classes.findAll({where:args})
+            resolve: () => db.models.Classes.findAll()
         },  
         messages: {
             type: new GraphQLList(MessageType),
             description: 'A list of all messages between users',
-            args:{ 
-                id :{
-                    type:GraphQLID
-                },
-                senderId:{
-                    type:GraphQLID
-                },
-                recipentId:{
-                    type:GraphQLID
-                },timestamp:{
-                    type:GraphQLString
-                }
-
-            },
-            resolve: (root, args) => db.models.Messages.findAll({where:args})
+            resolve: () => db.models.Messages.findAll()
         },
         sessions: {
             type: new GraphQLList(SessionType),
             description: 'A list of all active user sessions',
-            args:{
-                token:{ 
-                    type:GraphQLString
-                },
-                userId :{
-                    type:GraphQLID
-                }
-            },
-            resolve: (root, args) => db.models.Sessions.findAll({where:args})
+            resolve: () => db.models.Sessions.findAll()
         },
-        // singleSkill: {
-        //     type: SkillType,
-        //     description: 'A single skill',
-        //     args: {
-        //         id: { type: GraphQLNonNull(GraphQLInt) }
-        //     },
-        //     resolve: (parent, args) => { 
-        //         return db.models.SkillsOffered.find({where:args});
-        //     }
-        //}
-
-
+        singleSkill: {
+            type: SkillType,
+            description: 'A single skill',
+            args: {
+                id: { type: GraphQLNonNull(GraphQLID) }
+            },
+            resolve: async (skill, args) => { 
+                const skillArray = await db.models.SkillsOffered.findAll({where:args});
+                return skillArray[0];
+            }
+        },
+        singleUser: {
+            type: UserType,
+            description: 'A single skill',
+            args: {
+                id: { type: GraphQLNonNull(GraphQLID) }
+            },
+            resolve: async (parent, args) => {
+                const userArray = await db.models.User.findAll({where: args});
+                return userArray[0];
+            }
+        },
+        singleClass: {
+            type: ClassType,
+            description: 'A single class',
+            args: {
+                id: { type: GraphQLNonNull(GraphQLID) }
+            },
+            resolve: async (parent, args) => {
+                const classArray = await db.models.Classes.findAll({where: args});
+                return classArray[0];
+            } 
+        },
+        singleMessage: {
+            type: MessageType,
+            description: 'A single message',
+            args: {
+                id: { type: GraphQLNonNull(GraphQLID) }
+            },
+            resolve: async (parent, args) => {
+                const messageArray = await db.models.Messages.findAll({where: args});
+                return messageArray[0];
+            } 
+        }
     })
 });
 
@@ -315,7 +294,7 @@ const RootMutationType = new GraphQLObjectType({
                     creditBalance: 5
                 };
                 
-                return db.models.User.create({user})
+                return db.models.User.create(user)
                 
             }
         },
@@ -365,7 +344,7 @@ const RootMutationType = new GraphQLObjectType({
             resolve: (parent, args) => {
                 const skill = {  
                     teacherId: args.teacherId, 
-                    name: args.name,
+                    skillName: args.name,
                     description: args.description ? args.description : '',
                     availability: args.availability ? args.availability : '',
                     duration: args.duration ? args.duration : 0,

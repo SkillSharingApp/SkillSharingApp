@@ -1,7 +1,7 @@
 const { Sequelize } = require("sequelize");
 const _ = require('lodash')
 const Faker = require('faker');
-const Op = Sequelize.Op;
+//const Op = Sequelize.Op;
 
 const sequelize = new Sequelize(
     'skillSharingAppDB',
@@ -167,21 +167,21 @@ User.hasMany(SkillsOffered);
 SkillsOffered.belongsTo(User);
 
 
-//creates 4 people
-    // sequelize.sync({force:true}).then(()=>{
-    //     _.times(10,()=>{
-    //         return User.create({
-    //             firstName:Faker.name.firstName(),
-    // lastName:Faker.name.lastName(),       
-    //             username:Faker.internet.userName(),
-    //             email:Faker.internet.email(),
-    //             password:Faker.internet.password(),
+// //creates 4 people
+//     sequelize.sync().then(()=>{
+//         _.times(10,()=>{
+//             return User.create({
+//                 firstName:Faker.name.firstName(),
+//                 lastName:Faker.name.lastName(),       
+//                 username:Faker.internet.userName(),
+//                 email:Faker.internet.email(),
+//                 password:Faker.internet.password(),
 
-    //         });
-    //     });
-    //     }).catch(function(e) {
-    //         console.log(`server/db,js line 176 ${e}`); 
-    // })
+//             });
+//         });
+//         }).catch(function(e) {
+//             console.log(`server/db,js line 176 ${e}`); 
+//     })
 
 
 module.exports = sequelize
