@@ -8,6 +8,7 @@ const {
     GraphQLFloat,
     GraphQLBoolean,
     GraphQLID,
+    GraphQLDATE
 } = require('graphql');
 const db = require('./db');
 
@@ -78,17 +79,18 @@ const SkillType = new GraphQLObjectType({
     description: 'This represents a single skill of a single user',
     fields: () => ({
         id: { type: GraphQLNonNull(GraphQLID) },
-        teacherId: { type: GraphQLNonNull(GraphQLID) },
+        teacherId: { type: GraphQLNonNull(GraphQLID)},
         skillName: { type: GraphQLNonNull(GraphQLString) },
         skillDescription: { type: GraphQLString },
         availability: { type: GraphQLString },
         duration: { type: GraphQLInt },
         overallRating: { type: GraphQLFloat },
-        numberOfRatings: { type: GraphQLNonNull(GraphQLInt) },
+        numberOfRatings: { type: GraphQLInt },
         teacher: {
             type: UserType,
             resolve: (skill) => {
-                return db.models.User.findAll({ where: { id: skill.teacherId } });
+                console.log(skill.teacherId)
+                return db.models.User.find({ where: { id: skill.teacherId } });
             }
         }
     })
@@ -102,6 +104,7 @@ const ClassType = new GraphQLObjectType({
         skillId: { type: GraphQLNonNull(GraphQLID) },
         confirmed: { type: GraphQLNonNull(GraphQLBoolean) },
         learnerId: { type: GraphQLNonNull(GraphQLID) },
+        time: { type: GraphQLNonNull(GraphQLString) },
         attended: { type: GraphQLNonNull(GraphQLBoolean) },
         learner: {
             type: UserType,
@@ -195,7 +198,12 @@ const RootQueryType = new GraphQLObjectType({
                 },
                 skillName:{
                     type:GraphQLString
-                }
+                },
+                skillDescription:{
+                    type:GraphQLString
+                },
+                availability: { 
+                type: GraphQLString }
 
             },
             resolve: (root ,args) => db.models.SkillsOffered.findAll({where:args})
@@ -212,9 +220,20 @@ const RootQueryType = new GraphQLObjectType({
                 },
                 learnerId:{
                     type:GraphQLID
+                },
+                time:{
+                    type: GraphQLString },
+                confirmed: {
+                    type:GraphQLBoolean
+                },
+                attended:{
+                    type:GraphQLBoolean
+                },
+                skillDescription:{
+                    type: GraphQLString
                 }
-
             },
+
             resolve: (root, args) => db.models.Classes.findAll({where:args})
         },  
         messages: {
@@ -227,9 +246,10 @@ const RootQueryType = new GraphQLObjectType({
                 senderId:{
                     type:GraphQLID
                 },
-                recipentId:{
+                recipientId:{
                     type:GraphQLID
-                },timestamp:{
+                },
+                timestamp:{
                     type:GraphQLString
                 }
 
@@ -279,16 +299,18 @@ const RootMutationType = new GraphQLObjectType({
                 email: { type: GraphQLNonNull(GraphQLString) },
                 password: { type: GraphQLNonNull(GraphQLString) }
             },
-            resolve: (parent, args) => {
-                const user = { 
+            resolve: async (parent, args) => {
+                console.log(args)
+             
+                let user = await db.models.User.create( { 
                     frstName: args.firstName,
                     username: args.username,
                     email: args.email.toLowerCase(),
                     password: args.password,
                     creditBalance: 5
-                };
-                
-                return db.models.User.create({user})
+                })
+
+                return user;
                 
             }
         },
@@ -299,16 +321,17 @@ const RootMutationType = new GraphQLObjectType({
                 id: { type: GraphQLNonNull(GraphQLID) },
                 firstName: { type: GraphQLString },
                 lastName: { type: GraphQLString },
-                username:{type: GraphQLNonNull(GraphQLString)},
-                email:{type: GraphQLNonNull(GraphQLString)},
-                oldPassword:{type: GraphQLNonNull(GraphQLString)},
-                password:{type: GraphQLNonNull(GraphQLString)},
-                creditBalance:{type: GraphQLNonNull(GraphQLInt)},
+                username:{type: GraphQLString},
+                email:{type: GraphQLString},
+                oldPassword:{type: GraphQLString},
+                password:{type: GraphQLString},
+                creditBalance:{type: GraphQLInt},
             },
-            resolve: (parent, args) => {
+            resolve: async(parent, args) => {
                 const updatedInfo ={}
-                let currentPass = db.models.find({where:{id:args.id}})
+        
                     if (args.password){
+                        let currentPass = await db.models.User.findAll({where:{id:args.id}})
                         if (args.oldpassword === currentPass.password ||args.oldpassword === currentPass[0].password){
                             updatedInfo.password =args.password
                         }else {
@@ -316,11 +339,14 @@ const RootMutationType = new GraphQLObjectType({
                         }
                     }
                     for (const [key,value] of Object.entries(args)){
-                        if (key !=="id" || key !== "password"|| key !== "oldpassword"){
-                            updatedInfo[key]=value
+                        if (key !=="id" && key !== "password" && key !== "oldpassword"){
+                            updatedInfo[key]= value
                         }
                     }
-                return db.models.User.update({id:args.id},updatedInfo)
+
+                let newUser = await db.models.User.update(updatedInfo, { where: { id: args.id}})
+                const updatedUser = await db.models.User.findAll({where:{id: args.id}})
+                return updatedUser;
                
             }
         },
@@ -330,16 +356,16 @@ const RootMutationType = new GraphQLObjectType({
             description: 'Add a skill offered by a user',
             args: {
                 teacherId: { type: GraphQLNonNull(GraphQLID) },
-                name: { type: GraphQLNonNull(GraphQLString) },
-                description: { type: GraphQLString },
-                availability: { type: GraphQLString },
+                skillName: { type: GraphQLNonNull(GraphQLString) },
+                skillDescription: { type: GraphQLNonNull( GraphQLString) },
+                availability: { type: GraphQLNonNull( GraphQLString) },
                 duration: { type: GraphQLInt }
             },
             resolve: (parent, args) => {
                 const skill = {  
                     teacherId: args.teacherId, 
-                    name: args.name,
-                    description: args.description ? args.description : '',
+                    skillName: args.skillName,
+                    skillDescription: args.skillDescription ? args.skillDescription : '',
                     availability: args.availability ? args.availability : '',
                     duration: args.duration ? args.duration : 0,
                     overallRating: 0,
@@ -355,20 +381,20 @@ const RootMutationType = new GraphQLObjectType({
             description: 'Update a skill, excepting ratings fields',
             args: {
                 id: { type: GraphQLNonNull(GraphQLID) },
-                name: { type: GraphQLString },
-                description: { type: GraphQLString },
+                skillName: { type: GraphQLString },
+                skillDescription: { type: GraphQLString },
                 availability: { type: GraphQLString },
                 duration: { type: GraphQLInt }
             },
-            resolve: (parent, args) => {
+            resolve: async(parent, args) => {
+            const updatedInfo ={}
+                for (const [key,value] of Object.entries(args)){
+                    if (key !=="id"){
+                        updatedInfo[key]= value
+                    }
+                }
 
-                //stephanie
-                const skill = db.models.SkillOffered.findOne({where:{skillId: args.id}});
-                if (args.name) skill.name = args.name;
-                if (args.description) skill.description = args.description;
-                if (args.availability) skill.availability = args.availability;
-                if (args.duration) skill.duration = args.duration;
-                return skill;
+                const updatedskill= await db.models.SkillsOffered.update(updatedInfo,{where:{ id: args.id}})
             }
         },
         deleteSkill: {
@@ -377,10 +403,12 @@ const RootMutationType = new GraphQLObjectType({
             args: {
                 id: { type: GraphQLNonNull(GraphQLID) }
             },
-            resolve: (parent, args) => {
-                // let skill = db.models.SkillOffered.findOne({where:{id: args.id}}) 
-                // return skill.destroy
-                return db.models.SkillOffered.delete(args.id)
+            resolve: async(parent, args) => {
+                console.log(args)
+                //const findSkill =db.models.SkillsOffered
+                let skill = await db.models.SkillsOffered.destroy({where: {id: args.id}}) 
+                return skill
+               
             }
         },
         addClass: {
@@ -388,14 +416,18 @@ const RootMutationType = new GraphQLObjectType({
             description: 'Add a class session',
             args: {
                 skillId: { type: GraphQLNonNull(GraphQLID) },
-                learnerId: { type: GraphQLNonNull(GraphQLID) }
+                learnerId: { type: GraphQLNonNull(GraphQLID) },
+                time: { type: GraphQLString } ,
+              
             },
-            resolve: (parent, args) => {
+            resolve: async(parent, args) => {
                 const classItem = {
                     skillId: args.skillId,
                     confirmed: false,
                     learnerId: args.learnerId,
-                    attended: false
+                    attended: false,
+                    time: args.time
+
                 };
                 return db.models.Classes.create(classItem);
             }
@@ -406,17 +438,21 @@ const RootMutationType = new GraphQLObjectType({
             args: {
                 id: { type: GraphQLNonNull(GraphQLID) },
                 confirmed: { type: GraphQLBoolean },
-                attended: { type: GraphQLBoolean }
+                attended: { type: GraphQLBoolean },
+                time:{type:GraphQLString},
             },
-            resolve: (parent, args) => {
+            resolve: async(parent, args) => {
+                console.log(args)
                 const updatedInfo ={}
                 for (const [key,value] of Object.entries(args)){
                     if (key !== 'id'){
-                    updatedInfo[key]= value 
+                        updatedInfo[key] =value
                     }
                 }
-                db.models.Classes.update({id:args.id},updatedInfo)
-               
+               const updatedClass = await db.models.Classes.update(updatedInfo,{where:{ id: args.id}})
+               return db.models.Classes.findAll({ where :{ id: args.id}})
+
+               //stephanie works but returns error 
             }
         },
         deleteClass: {
@@ -425,9 +461,9 @@ const RootMutationType = new GraphQLObjectType({
             args: {
                 id: { type: GraphQLNonNull(GraphQLID) }
             },
-            resolve: (parent, args) => {
-                let aClass = db.models.Classes.findOne({where:{id: args.id}}) 
-                return aClass.destroy;
+            resolve: async(parent, args) => {
+                let deletedClass = await db.models.Classes.destroy({where: {id: args.id}}) 
+                return deleteClass
             }
         },
         addMessage: {
@@ -438,16 +474,16 @@ const RootMutationType = new GraphQLObjectType({
                 recipientId: { type: GraphQLNonNull(GraphQLID) },
                 content: { type: GraphQLNonNull(GraphQLString) }
             },
-            resolve: (parent, args) => {
-                const message = {
+            resolve: async(parent, args) => {
+                console.log(args)
+                let newMessage = await db.models.Messages.create({
                     senderId: args.senderId,
                     recipientId: args.recipientId,
                     content: args.content,
-                    timestamp: new Date().toString()
-                };
-                return db.models.Messages.create(message)
-                
+                    timestamp: new Date().toString()})
+                return newMessage
             }
+            //works
         },
         addSession: {
             type: SessionType,
@@ -456,12 +492,13 @@ const RootMutationType = new GraphQLObjectType({
                 token: { type: GraphQLNonNull(GraphQLString) },
                 userId: { type: GraphQLNonNull(GraphQLID) }
             },
-            resolve: (parent, args) => {
+            resolve: async(parent, args) => {
                 const session = {
                     token: args.token,
                     userId: args.userId
                 };
-               return db.models.Sessions.create(session)
+               let newSessh= await db.models.Sessions.create(session)
+               return newSessh
             }
         },
         deleteSession: {
@@ -470,9 +507,10 @@ const RootMutationType = new GraphQLObjectType({
             args: {
                 token: { type: GraphQLNonNull(GraphQLString) }
             },
-            resolve: (parent, args) => {
-                let sessh = db.models.Classes.findOne({where:{id: args.id}}) 
+            resolve: async(parent, args) => {
+                let deletedSessh = await db.models.Sessions.destroy({where:{id: args.id}}) 
                 return sessh.destroy;
+            
                 //sessions.splice(sessions.indexOf(sessions.find(session => session.token === args.token)), 1)[0];
             }
         }
