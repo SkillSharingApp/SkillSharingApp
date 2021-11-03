@@ -21,20 +21,19 @@ import {
   registerGlobals
 } from 'react-native-webrtc';
 
+// remove this when this is turned into a separate screen
 const props = {
   isInstructor: true,
   classId: 1
 };
 
-const App = (props) => {
+const App = () => {
   // set instructorStream and studentStream states and handlers
   const [instructorStream, setInstructorStream] = useState(null);
   const [studentStream, setStudentStream] = useState(null);
-  const [mirror, setMirror] = useState(false);
+  const [mirrorView, setMirrorView] = useState(false);
 
-  const mirrorPress = () => {
-    if (props.isInstructor) setMirror(!mirror);
-  }
+  const mirrorPress = () => props.isInstructor && setMirrorView(!mirrorView);
 
   // functions to start and stop instructor stream
   const startInstructorStream = async () => {
@@ -72,11 +71,11 @@ const App = (props) => {
     backgroundColor: 'skyblue'
     }}>
     {!instructorStream && <Text style={{color: "black"}}>Waiting for connection...</Text>}
-    {instructorStream && <RTCView streamURL = {instructorStream.toURL()} style={styles.instructorStream} key={'instructorView'} />}
+    {instructorStream && <RTCView streamURL = {instructorStream.toURL()} mirror = {mirrorView} zOrder = {5}  style={styles.instructorStream} key={'instructorView'} />}
     <PipView stream = {studentStream || instructorStream} />
     </View>
     <View>
-      <Button title = 'Mirror' onPress = {mirrorPress} />
+      {props.isInstructor && <Button title = 'Mirror' onPress = {mirrorPress} />}
       <Button title = 'Start' onPress = {startInstructorStream} />
       <Button title = 'Stop' onPress = {stopInstructorStream} /> 
     </View>
@@ -91,9 +90,7 @@ const styles = StyleSheet.create({
   },
   instructorStream: {
     flex: 1,
-    height: '100%',
-    mirror: false,
-    zOrder: 5
+    height: '100%'
   },
   footer: {
     backgroundColor: 'lightgray',
