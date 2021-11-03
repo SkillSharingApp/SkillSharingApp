@@ -1,6 +1,7 @@
 const { Sequelize } = require("sequelize");
 const _ = require('lodash')
 const Faker = require('faker');
+const Op = Sequelize.Op;
 
 const sequelize = new Sequelize(
     'skillSharingAppDB',
@@ -90,9 +91,7 @@ const Sessions = sequelize.define('Sessions',{
             deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
         },
     },
-    session:{
-        type: Sequelize.STRING
-    },
+
 });
 const Messages = sequelize.define('Messages',{
     id: {
@@ -138,7 +137,7 @@ const SkillsOffered = sequelize.define('SkillsOffered',{
         type: Sequelize.TIME,
         allowNull: false
     },
-    TeacherId:{
+    teacherId:{
         type: Sequelize.UUID,
         references: {
             model: User,
@@ -147,7 +146,7 @@ const SkillsOffered = sequelize.define('SkillsOffered',{
           },
 
     },
-    avalability:{
+    availability:{
         type: Sequelize.STRING
     },
     overallRating:{
@@ -167,25 +166,22 @@ Messages.belongsTo(User);
 User.hasMany(SkillsOffered);
 SkillsOffered.belongsTo(User);
 
-// sequelize.sync({force:true}).then(()=>{
-//     _.times(4,()=>{
-//         return User.create({
-//             name:Faker.name.firstName(),
-//             username:Faker.internet.userName(),
-//             email:Faker.internet.email(),
-//             password:Faker.internet.password(),
 
-//         });
-//     });
-//     }).catch(function(e) {
-//         console.log(`server/db,js line 176 ${e}`); 
-//})
-// sequelize.sync({force:true}).then(()=>{
+//creates 4 people
+    // sequelize.sync({force:true}).then(()=>{
+    //     _.times(10,()=>{
+    //         return User.create({
+    //             firstName:Faker.name.firstName(),
+    // lastName:Faker.name.lastName(),       
+    //             username:Faker.internet.userName(),
+    //             email:Faker.internet.email(),
+    //             password:Faker.internet.password(),
 
-//         let conn = User.findAll();
-//         console.log(conn)
-//     }).catch(function(e) {
-//         console.log(`server/db,js line 176 ${e}`); 
-// })
+    //         });
+    //     });
+    //     }).catch(function(e) {
+    //         console.log(`server/db,js line 176 ${e}`); 
+    // })
+
 
 module.exports = sequelize
