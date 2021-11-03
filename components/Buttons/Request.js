@@ -3,17 +3,20 @@ import { useNavigation } from '@react-navigation/native';
 import { Button, Text, View } from 'react-native';
 
 //this one button can handle both requests for bookings, and rescheduling
-export default RequestButton = ({ skillId, teacherId, userId, reschedule = false , screenName }) =>{
+export default RequestButton = ({ availability, skillId, teacherId, userId, reschedule = false , skill, teacher, screenName }) =>{
     const navigation = useNavigation();
 
-    const idObj = {
+    const paramObj = {
         teacherId,
         userId,
-        skillId
+        skillId,
+        availability,
+        skill,
+        teacher
     }
 
     const goToSetSchedule = () =>{
-        navigation.navigate(screenName, idObj);
+        navigation.navigate(screenName, paramObj);
     }
 
     return (

@@ -7,6 +7,16 @@ import DatePicker from 'react-native-date-picker'
 export default SetScheduleScreen = ({ route, navigation }) => {
     //when routed to this screen we will be sent these three params from the
     //Request button
+    const {
+        teacherId,
+        userId,
+        skillId,
+        availability,
+        teacher,
+        skill
+    } = route.params;
+
+
     const [date, setDate] = useState(new Date())
 
     const style={
@@ -25,7 +35,9 @@ export default SetScheduleScreen = ({ route, navigation }) => {
 
     return (
     <View style={style.container}> 
-        <Text>YOU MADE IT TO SCHEDULE SCREEN</Text>
+        <Text>{skill}</Text>
+        <Text> {teacher} </Text>
+        <Text>{availability}</Text>
 
         <DatePicker 
             date={date} 
@@ -33,7 +45,6 @@ export default SetScheduleScreen = ({ route, navigation }) => {
             minimumDate={new Date()}
             minuteInterval={15} />
 
-        <Text> Current date is {JSON.stringify(date)} </Text>
         <Button title="Send Booking Request" onPress={sendRequest}/>
     </View>
     )

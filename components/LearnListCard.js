@@ -13,7 +13,7 @@ export default LearnListCard = (props) => {
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 6,
+        borderRadius: 10,
         elevation: 3, 
         backgroundColor: '#fff',
         shadowOffset: { width: 1, height: 1 }, 
