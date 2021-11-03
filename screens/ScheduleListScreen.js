@@ -15,7 +15,7 @@ import ScheduleCard from '../components/ScheduleCard';
 // `;
 
 export default ScheduleListScreen = ({ route, navigation }) => {
-
+    const { userId } = route.params;
 
     // const { loading, error, data } = useQuery(CLASSES, { 
     //     variables: { id: skillId }
@@ -32,13 +32,13 @@ export default ScheduleListScreen = ({ route, navigation }) => {
         teacher: 123,
         confirmed: true ,
         time: Date.now(),
-        learner: 3,
+        learner: 8,
         attended: false
     },{
         id: 2 ,
         skillId: 344, 
         skill: 'Driving',
-        teacher: 3,
+        teacher: 121,
         confirmed: true ,
         time: Date.now(),
         learner: 123,
@@ -59,7 +59,10 @@ export default ScheduleListScreen = ({ route, navigation }) => {
 
     const styles ={
         container: {
-            backgroundColor: 'blue'
+            backgroundColor: 'white',
+            paddingLeft: 20,
+            paddingRight: 20,
+            
         }
     }
     
@@ -81,12 +84,12 @@ export default ScheduleListScreen = ({ route, navigation }) => {
                 data={displayArray}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={()=> navigation.navigate('Call', item)}>
-                        <LearnListCard>
+                        <ScheduleCard isTeacher={item.teacher === userId}>
                             <Text style={styles.skillTitle}>{ item.skill }</Text>
-                            <Text>taught by: { item.teacher }</Text>
+                            {(item.teacher===userId)? <Text>studentId is {item.learner}</Text>: <Text>taught by: {item.teacher}</Text>}
                             <Text>{item.time}</Text>
                             {!item.confirmed && <Button title='Confirm' onPress={() => confirmClass(item.id)}></Button>}
-                        </LearnListCard>
+                        </ScheduleCard>
                     </TouchableOpacity>
                 )}
             />
