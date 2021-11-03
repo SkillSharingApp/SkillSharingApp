@@ -10,10 +10,12 @@ export default PipView = (props) => {
         backgroundColor: 'black',
         width: '20%',
         height: '20%',
+        bottom: 0,
+        right: 0,
         zIndex: 10
       }
     }>
-      {props.stream && <RTCView streamURL = {props.stream} style={{height:'100%', zOrder:20, flex: 1}} />}
+      {props.stream && <RTCView streamURL = {props.stream.toURL()} style={{height:'100%', zOrder:20, flex: 1}} />}
     </View>
   )
 }

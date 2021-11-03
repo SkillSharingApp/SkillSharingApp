@@ -73,7 +73,7 @@ const App = (props) => {
     }}>
     {!instructorStream && <Text style={{color: "black"}}>Waiting for connection...</Text>}
     {instructorStream && <RTCView streamURL = {instructorStream.toURL()} style={styles.instructorStream} key={'instructorView'} />}
-    <PipView stream = {studentStream} />
+    <PipView stream = {studentStream || instructorStream} />
     </View>
     <View>
       <Button title = 'Mirror' onPress = {mirrorPress} />
