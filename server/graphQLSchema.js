@@ -450,7 +450,7 @@ const RootMutationType = new GraphQLObjectType({
                     }
                 }
                const updatedClass = await db.models.Classes.update(updatedInfo,{where:{ id: args.id}})
-               return db.models.Classes.findAll({ where :{ id: args.id}})
+               return db.models.Classes.findAll({ where :{id:args.id}})
 
                //stephanie works but returns error 
             }
