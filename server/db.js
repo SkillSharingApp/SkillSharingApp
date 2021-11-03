@@ -1,7 +1,7 @@
 const { Sequelize } = require("sequelize");
 const _ = require('lodash')
 const Faker = require('faker');
-const Op = Sequelize.Op;
+//const Op = Sequelize.Op;
 
 const sequelize = new Sequelize(
     'skillSharingAppDB',
