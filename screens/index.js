@@ -10,6 +10,7 @@ import ScheduleListScreen from "./ScheduleListScreen";
 import SetScheduleScreen from "./SetScheduleScreen";
 import TeachListScreen from "./TeachListScreen";
 import TeachSkillScreen from "./TeachSkillScreen";
+import ProfileScreen from "./ProfileScreen";
 
 const views = {
     LoginScreen,
@@ -23,7 +24,8 @@ const views = {
     ScheduleListScreen,
     SetScheduleScreen,
     TeachListScreen,
-    TeachSkillScreen
+    TeachSkillScreen,
+    ProfileScreen
 }
 
 export default views; 

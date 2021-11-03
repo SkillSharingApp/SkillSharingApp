@@ -1,8 +1,8 @@
 import React from "react";
-import { Button } from 'react-native';
+import { Button, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-export default DeleteSkillButton = ({ navigation }) =>{
+export default DeleteSkillButton = ({ skillId }) =>{
     const navigation = useNavigation();
 
     const confirmDeletion = () =>{
@@ -26,6 +26,7 @@ export default DeleteSkillButton = ({ navigation }) =>{
     return (
         <Button 
             //style={}
-            title="Delete Skill"/>
+            title="Delete Skill"
+            onPress={confirmDeletion}/>
     )
 }

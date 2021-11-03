@@ -5,7 +5,7 @@ import LearnListCard from "../components/LearnListCard";
 
 
 export default  LearnListScreen = ({ route, navigation }) => {
-    const {id, name} = route.params 
+    const {userId, name} = route.params 
 
     const dummyClasses =[{
        skillId: 100, 

@@ -4,7 +4,7 @@ import {Button, Image, View} from 'react-native';
 export default HomeScreen = ({ navigation }) => {
   //store userToken/id here to pass on to views
   const passedParams={
-    id: 123,
+    userId: 123,
     name: 'Sam'
   } 
   
