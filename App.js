@@ -19,12 +19,13 @@ import {
   MediaStream,
   MediaStreamTrack,
   mediaDevices,
-  registerGlobals
+  registerGlobals,
+  RTCSessionDescriptionType
 } from 'react-native-webrtc';
 
 // remove this when this is turned into a separate screen
 const props = {
-  isInstructor: true,
+  isInstructor: !true,
   classId: 1
 };
 
@@ -44,8 +45,13 @@ const App = () => {
   useEffect( () => {
     if (!props.isInstructor) {
       if (!studentJoined) setStudentJoined(true);
+      classSignals.onSnapshot(snapshot => {
+        let offer = snapshot.get('teacherOffer');
+        if (offer !== '') {
+          setTeacherJoined(true);
+        }
+      });
     }
-
     if (props.isInstructor && !teacherJoined) setTeacherJoined(true);
   }, [])
   
@@ -79,15 +85,32 @@ const App = () => {
     try {
       // get access to cam and mic
       let stream = await mediaDevices.getUserMedia({ video: true, audio: true });
-      stream.getTracks().forEach(track => pc.addTrack(track, stream));
       // props.isInstructor ? setInstructorStream(stream) : setStudentStream(stream);
 
+      // instructor side code
       if (props.isInstructor) {
+        // set instructor stream
         setInstructorStream(stream);
-        pc.createOffer().then(desc => {
-          pc.setLocalDescription(desc).then()
+        pc.createOffer()
+        .then(desc => {
+          pc.setLocalDescription(desc)
+          .then(() => {
+            // post offer to Firebase
+            classSignals.update({
+            teacherOffer: pc.localDescription});
+          })
         })
+      } else {
+        // student side code
+        setStudentStream(stream);
+        let teacherOffer = await classSignals.get('teacherOffer');
+        await pc.setRemoteDescription(new RTCSessionDescription(teacherOffer));
+        const studentAnswer = await pc.createAnswer();
+        await pc.setLocalDescription(studentAnswer);
+        await classSignals.update({studentAnswer : pc.localDescription});
       }
+
+
     } catch (err) {
       console.error(err);
     }
