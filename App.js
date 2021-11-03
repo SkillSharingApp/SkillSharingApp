@@ -3,7 +3,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import views from './screens/index';
-import { Button } from 'react-native';
+import { Image, TouchableOpacity } from 'react-native';
 
 const {
   LoginScreen,
@@ -24,13 +24,24 @@ const client = new ApolloClient({
   uri: 'http://localhost:3000/graphql',
   cache: new InMemoryCache()
 });
+const styles = {
+  avatarIcon: {
+    resizeMode: "cover",
+    height: 40,
+    width: 40
+  }
+}
+
 const headerStyle = {
   headerStyle: {
     backgroundColor: '#f4511e',
   },
   headerTintColor: '#fff',
   headerTitleAlign: 'center',
-  headerRight: () => <Button title="avatar"/>,
+  headerRight: () => 
+  <TouchableOpacity onPress={()=> console.log("avatar clicked")}>
+      <Image style={styles.avatarIcon} source={require('./staticImages/avataricon.png')} />
+  </TouchableOpacity>
 }
 
 

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Button } from 'react-native';
 import { useQuery, gql } from '@apollo/client';
 import LearnListCard from "../components/LearnListCard";
+import RequestButton from "../components/Buttons/Request";
 
 const SKILL = gql`
     query singleSkill($id: ID!) {
@@ -33,21 +34,22 @@ export default LearnSkillScreen = ({ route, navigation }) => {
     //     userId: , 
     //     teacherId: ,
     // }
+    const userId = 10;
+    const teacherId = 123;
     
     return (
-    <LearnListCard>
-        <Text>Welcome to LearnSkillView</Text>
-        <Text>{ data.singleSkill.teacher.username }</Text>
-        <Text>{ data.singleSkill.overallRating }</Text>
-        <Text>{ data.singleSkill.skillDescription }</Text>
-        <Text>{ data.singleSkill.duration } minutes</Text>
-        <Text>{ data.singleSkill.availability }</Text>
-
+    <View>
+        <Text>So you wanna learn { skill }</Text>
+        <Text>{ teacher } can teach you!</Text>
+        <Text>{ rating }</Text>
+        <Text> Description can go here! </Text>
         <View>
+            {//when a user clicks the message button, we can pass their userId and the teacherID to the messageScreen
+            }
             <Button title="messageButton" onPress={()=> navigation.navigate('Message')}>Message</Button>
-            <Button title="bookButton">Book</Button>
+            <RequestButton screenName = "SetSchedule" teacherId={teacherId} userId={userId} skillId={skillId} />
         </View>
-    </LearnListCard>
+    </View>
     );
 };
 
