@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import PipView from './components/PipView';
+import firestore from '@react-native-firebase/firestore';
 
 
 import {
@@ -32,6 +33,33 @@ const App = () => {
   const [instructorStream, setInstructorStream] = useState(null);
   const [studentStream, setStudentStream] = useState(null);
   const [mirrorView, setMirrorView] = useState(false);
+  const [teacherJoined, setTeacherJoined] = useState(false);
+  const [studentJoined, setStudentJoined] = useState(false);
+
+  //Firebase connection logic
+  const classSignals = firestore().collection('classes').doc(`${props.classId}`);
+  classSignals.get().then(data => console.log(data))
+  
+  // if user is teacher, set teacherJoined to true otherwise make studentJoined true
+  useEffect( () => {
+    if (!props.isInstructor) {
+      if (!studentJoined) setStudentJoined(true);
+    }
+
+    if (props.isInstructor && !teacherJoined) setTeacherJoined(true);
+  }, [])
+  
+
+  // webRTC connection logic
+  const configuration = {
+  iceservers: [
+    {urls: 'stun:stun.l.google.com:19302'},
+    {urls: 'stun:stun1.l.google.com:19302'},
+    {urls: 'stun:stun2.l.google.com:19302'}
+    ]
+  };
+
+  const pc = new RTCPeerConnection(configuration);
 
   const mirrorPress = () => props.isInstructor && setMirrorView(!mirrorView);
 
@@ -46,6 +74,24 @@ const App = () => {
       }
     }
   };
+
+  const startButtonPress = async () => {
+    try {
+      // get access to cam and mic
+      let stream = await mediaDevices.getUserMedia({ video: true, audio: true });
+      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+      // props.isInstructor ? setInstructorStream(stream) : setStudentStream(stream);
+
+      if (props.isInstructor) {
+        setInstructorStream(stream);
+        pc.createOffer().then(desc => {
+          pc.setLocalDescription(desc).then()
+        })
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const stopInstructorStream = () => {
     if (instructorStream) {
@@ -70,14 +116,15 @@ const App = () => {
     alignItems: 'center',
     backgroundColor: 'skyblue'
     }}>
-    {!instructorStream && <Text style={{color: "black"}}>Waiting for connection...</Text>}
+    {!instructorStream && <Text style={{color: "black"}}>Waiting for instructor to join...</Text>}
     {instructorStream && <RTCView streamURL = {instructorStream.toURL()} mirror = {mirrorView} zOrder = {5}  style={styles.instructorStream} key={'instructorView'} />}
     <PipView stream = {studentStream || instructorStream} />
     </View>
     <View>
       {props.isInstructor && <Button title = 'Mirror' onPress = {mirrorPress} />}
-      <Button title = 'Start' onPress = {startInstructorStream} />
-      <Button title = 'Stop' onPress = {stopInstructorStream} /> 
+      {/* <Button title = 'Start' disabled = {!teacherJoined} onPress = {startInstructorStream} /> */}
+      <Button title = 'Start' disabled = {!teacherJoined} onPress = {startButtonPress} />
+      <Button title = 'Stop' disabled = {!teacherJoined} onPress = {stopInstructorStream} /> 
     </View>
   </View>
   );
