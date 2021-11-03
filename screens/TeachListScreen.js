@@ -1,6 +1,7 @@
 import React, { useState, useEffect }from "react";
 import {View, Text, Button, TouchableOpacity, FlatList} from 'react-native';
 import TeachingCard from "../components/TeachingCard";
+import NewSkillButton from "../components/Buttons/NewClass";
 
 
 export default TeachListScreen = ({ route, navigation }) => {
@@ -45,7 +46,7 @@ export default TeachListScreen = ({ route, navigation }) => {
 
     return (
         <View> 
-        <Button title="Add a new Skill"></Button>
+        <NewSkillButton title="Add a new Skill" screenName="TeachSkill" />
         <Text>Current Skills</Text>
         <FlatList
             data={skillsArray}

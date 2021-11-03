@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import LearnListCard from "../components/LearnListCard";
+import { AirbnbRating } from "react-native-ratings";
 
 
 
@@ -43,21 +44,40 @@ export default  LearnListScreen = ({ route, navigation }) => {
         setClassesToRender(dummyClasses);
     }, [])
 
+    const styles = {
+        container: {
+            flex: 1, 
+            paddingLeft: 20,
+            paddingRight: 20
+        },
+        skillTitle: {
+            fontSize: 20,
+            textDecorationLine: 'underline'
+        }
+    }
+
     return (
-        <View> 
+        <View style={{flex: 1}}> 
             <Text>What do you wanna learn {name}?</Text>
-            <FlatList
-                data={dummyClasses}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={()=> navigation.navigate('LearnSkill', item)}>
-                        <LearnListCard>
-                            <Text>{ item.skill }</Text>
-                            <Text>taught by: { item.teacher }</Text>
-                            <Text>rating: { item.rating }</Text>
-                        </LearnListCard>
-                    </TouchableOpacity>
-                )}
-                />
+            <View style={styles.container}>
+                <FlatList
+                    data={dummyClasses}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity onPress={()=> navigation.navigate('LearnSkill', item)}>
+                            <LearnListCard>
+                                <Text style={styles.skillTitle}>{ item.skill }</Text>
+                                <Text>taught by: { item.teacher }</Text>
+                                <AirbnbRating 
+                                    defaultRating={item.rating}
+                                    size={20}
+                                    showRating={false}
+                                    isDisabled={true}
+                                    />  
+                            </LearnListCard>
+                        </TouchableOpacity>
+                    )}
+                    />
+            </View>
         </View>
     );
 };

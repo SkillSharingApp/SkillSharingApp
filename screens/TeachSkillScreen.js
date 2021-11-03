@@ -4,12 +4,19 @@ import DeleteSkill from "../components/Buttons/DeleteSkill";
 
 
 export default TeachSkillScreen = ({ route, navigation }) => {
-    const {id, skillName, skillDescription, availability, duration} = route.params
+    let id, skillName, skillDescription, availability, duration = undefined;
+    if(route.params) {
+       id = route.params.id;
+       skillName = route.params.skillName;
+       skillDescription = route.params.skillDescription;
+       availability = route.params.availability;
+       duration = route.params.druation;
+    }
 
-    const [newSkillName, setNewSkillName] = useState(skillName);
-    const [newSkillDescription, setNewSkillDescription] = useState(skillDescription);
-    const [newAvailability, setNewAvailability] = useState(availability);
-    const [newDuration, setNewDuration] = useState(duration);
+    const [newSkillName, setNewSkillName] = useState((skillName || ""));
+    const [newSkillDescription, setNewSkillDescription] = useState((skillDescription || ""));
+    const [newAvailability, setNewAvailability] = useState((availability || ""));
+    const [newDuration, setNewDuration] = useState((duration || ""));
 
 
     const styles = {

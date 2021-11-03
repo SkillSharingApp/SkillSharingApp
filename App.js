@@ -53,16 +53,16 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={headerStyle}>
-        <Stack.Screen name="Login" component={LoginScreen} options={{title: "skillXchange"}}/>
-        <Stack.Screen name="Home" component={HomeScreen} />
+        {/* <Stack.Screen name="Login" component={LoginScreen} options={{title: "skillXchange"}}/> */}
+        <Stack.Screen name="Home" component={HomeScreen} options={{title: "skillXchange"}} />
         <Stack.Screen name="Call" component={CallScreen} />
-        <Stack.Screen name="LearnList" component={LearnListScreen} />
+        <Stack.Screen name="LearnList" component={LearnListScreen} options={{title: 'Learn Something New'}} />
         <Stack.Screen name="LearnSkill" component={LearnSkillScreen} options={({route})=>({title: route.params.skill})}/>
-        <Stack.Screen name="TeachList" component={TeachListScreen} />
+        <Stack.Screen name="TeachList" component={TeachListScreen} options={{title: 'Share a Skill'}}/>
         <Stack.Screen name="TeachSkill" component={TeachSkillScreen} />
-        <Stack.Screen name="MessageList" component={MessageListScreen} />
+        <Stack.Screen name="MessageList" component={MessageListScreen} options={{title: 'Inbox'}}/>
         <Stack.Screen name="Message" component={MessageScreen} />
-        <Stack.Screen name="ScheduleList" component={ScheduleListScreen} />
+        <Stack.Screen name="ScheduleList" component={ScheduleListScreen} options={{title: 'Your Sessions'}}/>
         <Stack.Screen name="ScheduleClass" component={ScheduleClassScreen} />
         <Stack.Screen name="SetSchedule" component={SetScheduleScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />

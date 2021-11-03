@@ -14,6 +14,7 @@ export default NewClassButton = ({ screenName }) =>{
     return (
         <Button 
             //style={}
-            title="Add New Class"/>
+            title="Add New Class"
+            onPress={goToTeachSkillScreen}/>
     )
 }
