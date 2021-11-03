@@ -2,11 +2,34 @@ import React, { useState, useEffect }from "react";
 import {View, Text, Button, TouchableOpacity, FlatList} from 'react-native';
 import TeachingCard from "../components/TeachingCard";
 import NewSkillButton from "../components/Buttons/NewClass";
+import { useQuery, gql } from "@apollo/client";
 
+const USER_SKILLS = gql`
+    query singleUser($id: ID!) {
+        singleUser(id: $id) {
+            skills {
+                id
+                skillName
+                overallRating
+            }
+        }
+    }
+    `;
 
 export default TeachListScreen = ({ route, navigation }) => {
     const { userId } = route.params;
     const [skillsArray, setSkillsArray] = useState([]);
+
+    const { id } = route.params;
+
+    const { loading, error, data } = useQuery(USER_SKILLS, { 
+        variables: { id }
+    });
+
+    if (loading) return <Text>Loading...</Text>;
+    if (error) return <Text>Error {JSON.stringify(error)}</Text>;
+
+
 
     const dummySkills = [{
         id: 13,
@@ -62,6 +85,6 @@ export default TeachListScreen = ({ route, navigation }) => {
             )}
             />
     </View>
-    ) 
+    )
 }
 

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import views from './screens/index';
@@ -21,6 +22,10 @@ const {
   ProfileScreen 
 } = views;
 
+const client = new ApolloClient({
+  uri: 'http://localhost:3000/graphql',
+  cache: new InMemoryCache()
+});
 const styles = {
   avatarIcon: {
     resizeMode: "cover",
@@ -51,8 +56,9 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={headerStyle}>
+    <ApolloProvider client={client}>
+     <NavigationContainer>
+     <Stack.Navigator screenOptions={headerStyle}>
         {/* <Stack.Screen name="Login" component={LoginScreen} options={{title: "skillXchange"}}/> */}
         <Stack.Screen name="Home" component={HomeScreen} options={{title: "skillXchange"}} />
         <Stack.Screen name="Call" component={CallScreen} />
@@ -67,7 +73,8 @@ const App = () => {
         <Stack.Screen name="SetSchedule" component={SetScheduleScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
-    </NavigationContainer>
+      </NavigationContainer>
+    </ApolloProvider>
   );
 };
 

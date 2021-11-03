@@ -1,10 +1,33 @@
 import React from "react";
 import { View, Text, Button } from 'react-native';
+import { useQuery, gql } from '@apollo/client';
+import LearnListCard from "../components/LearnListCard";
 import RequestButton from "../components/Buttons/Request";
 
+const SKILL = gql`
+    query singleSkill($id: ID!) {
+        singleSkill(id: $id) {
+            skillName
+            skillDescription
+            teacher {
+                id
+                username
+            }
+            availability
+            overallRating
+        }
+    }
+`;
 
-export default LearnSkillScreen =({ route, navigation }) =>{
-    const {skillId, skill, teacher, rating} = route.params;
+export default LearnSkillScreen = ({ route, navigation }) => {
+    const { userId, skillId } = route.params;
+
+    const { loading, error, data } = useQuery(SKILL, { 
+        variables: { id: skillId }
+    });
+
+    if (loading) return <Text>Loading...</Text>;
+    if (error) return <Text>Error {JSON.stringify(error)}</Text>;
 
     // query DB for all Skill fields to render Descriptive CARD! And pass to SetScheduleView
     const userId = 10;
@@ -25,6 +48,6 @@ export default LearnSkillScreen =({ route, navigation }) =>{
             <RequestButton screenName = "SetSchedule" teacherId={teacherId} userId={userId} skillId={skillId} availability={availability} teacher={teacher} skill={skill} />
         </View>
     </View>
-    )
-}
+    );
+};
 

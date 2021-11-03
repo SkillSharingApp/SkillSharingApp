@@ -1,7 +1,21 @@
 import React from "react";
 import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+import { useQuery, gql } from '@apollo/client';
 import MessageCard from "../components/MessageCard";
 
+const MESSAGES = gql`
+    query singleUser($id: ID!) {
+        singleUser(id: $id) {
+            conversationsList {
+                id
+                username
+                mostRecentMessageInConversationWith(partnerId: $id) {
+                    content
+                }
+            }
+        }
+    }
+`;
 
 export default MessageListScreen = ({ route, navigation }) => {
     const {userId} = route.params;
@@ -26,6 +40,12 @@ export default MessageListScreen = ({ route, navigation }) => {
         content: 'Hello there!',
         timestamp: "6 PM"
     }];
+    const { loading, error, data } = useQuery(MESSAGES, { 
+        variables: { id }
+    });
+
+    if (loading) return <Text>Loading...</Text>;
+    if (error) return <Text>Error {JSON.stringify(error)}</Text>;
 
     return (
     <View> 
