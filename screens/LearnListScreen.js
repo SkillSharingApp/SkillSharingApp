@@ -30,15 +30,20 @@ export default  LearnListScreen = ({ route, navigation }) => {
             <Text>What do you wanna learn {name}?</Text>
             <FlatList
                 data={data.skills}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={()=> navigation.navigate('LearnSkill', item.id)}>
+                renderItem={({ item }) => {
+                const params ={
+                    skillId: item.id,
+                    userId: id
+                }
+                return (
+                    <TouchableOpacity onPress={()=> navigation.navigate('LearnSkill', params)}>
                         <LearnListCard>
                             <Text>{ item.skillName }</Text>
                             <Text>taught by: { item.teacher.username }</Text>
                             <Text>rating: { item.overallRating }</Text>
                         </LearnListCard>
                     </TouchableOpacity>
-                )}
+                )}}
                 />
         </View>
     );

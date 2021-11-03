@@ -8,6 +8,7 @@ const {
     GraphQLFloat,
     GraphQLBoolean,
     GraphQLID,
+    GraphQLDATE,
 } = require('graphql');
 const { Sequelize } = require("sequelize");
 const Op = Sequelize.Op;
@@ -129,6 +130,7 @@ const ClassType = new GraphQLObjectType({
         id: { type: GraphQLNonNull(GraphQLID) },
         skillId: { type: GraphQLNonNull(GraphQLID) },
         confirmed: { type: GraphQLNonNull(GraphQLBoolean) },
+        time: { type: GraphQLString },
         learnerId: { type: GraphQLNonNull(GraphQLID) },
         attended: { type: GraphQLNonNull(GraphQLBoolean) },
         learner: {
@@ -230,7 +232,7 @@ const RootQueryType = new GraphQLObjectType({
                 id: { type: GraphQLNonNull(GraphQLID) }
             },
             resolve: async (skill, args) => { 
-                const skillArray = await db.models.SkillsOffered.findAll({where:args});
+                const skillArray = await db.models.SkillsOffered.findAll({where:{ id: args.id}});
                 return skillArray[0];
             }
         },
@@ -330,7 +332,6 @@ const RootMutationType = new GraphQLObjectType({
                
             }
         },
-
         addSkill: {
             type: SkillType,
             description: 'Add a skill offered by a user',
@@ -341,7 +342,7 @@ const RootMutationType = new GraphQLObjectType({
                 availability: { type: GraphQLString },
                 duration: { type: GraphQLInt }
             },
-            resolve: (parent, args) => {
+            resolve: async (parent, args) => {
                 const skill = {  
                     teacherId: args.teacherId, 
                     skillName: args.name,
@@ -351,7 +352,7 @@ const RootMutationType = new GraphQLObjectType({
                     overallRating: 0,
                     numberOfRatings: 0
                 };
-                return db.models.SkillsOffered.create(
+                return await db.models.SkillsOffered.create(
                     skill
                 )
             }
@@ -394,14 +395,17 @@ const RootMutationType = new GraphQLObjectType({
             description: 'Add a class session',
             args: {
                 skillId: { type: GraphQLNonNull(GraphQLID) },
-                learnerId: { type: GraphQLNonNull(GraphQLID) }
+                learnerId: { type: GraphQLNonNull(GraphQLID) },
+                time: { type: GraphQLString } ,
             },
             resolve: (parent, args) => {
                 const classItem = {
                     skillId: args.skillId,
                     confirmed: false,
                     learnerId: args.learnerId,
-                    attended: false
+                    attended: false,
+                    time: args.time
+
                 };
                 return db.models.Classes.create(classItem);
             }

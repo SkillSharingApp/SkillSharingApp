@@ -64,7 +64,7 @@ const Classes = sequelize.define('Classes',{
         defaultValue:false,
     },
     time:{
-        type: Sequelize.TIME,
+        type: Sequelize.STRING,
         allowNull: false
     },
     learnerId:{

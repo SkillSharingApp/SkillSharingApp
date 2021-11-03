@@ -10,20 +10,20 @@ const SKILL = gql`
             skillName
             skillDescription
             teacher {
+                id
                 username
             }
             availability
-            duration
             overallRating
         }
     }
 `;
 
 export default LearnSkillScreen = ({ route, navigation }) => {
-    const {id} = route.params;
+    const { userId, skillId } = route.params;
 
     const { loading, error, data } = useQuery(SKILL, { 
-        variables: { id }
+        variables: { id: skillId }
     });
 
     if (loading) return <Text>Loading...</Text>;
@@ -34,20 +34,19 @@ export default LearnSkillScreen = ({ route, navigation }) => {
     //     userId: , 
     //     teacherId: ,
     // }
-    const userId = 10;
-    const teacherId = 123;
     
     return (
     <View>
-        <Text>So you wanna learn { skill }</Text>
-        <Text>{ teacher } can teach you!</Text>
-        <Text>{ rating }</Text>
-        <Text> Description can go here! </Text>
+        <Text>{userId}</Text>
+        <Text>So you wanna learn { data.singleSkill.skillName }</Text>
+        <Text>{ data.singleSkill.teacher.username } can teach you!</Text>
+        <Text>{ data.singleSkill.overallRating }</Text>
+        <Text> {data.singleSkill.skillDescription} </Text>
         <View>
             {//when a user clicks the message button, we can pass their userId and the teacherID to the messageScreen
             }
             <Button title="messageButton" onPress={()=> navigation.navigate('Message')}>Message</Button>
-            <RequestButton screenName = "SetSchedule" teacherId={teacherId} userId={userId} skillId={skillId} />
+            <RequestButton screenName = "SetSchedule" teacherId={data.singleSkill.teacher.id} userId={userId} skillId={skillId} />
         </View>
     </View>
     );
