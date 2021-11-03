@@ -282,16 +282,18 @@ const RootMutationType = new GraphQLObjectType({
             type: UserType,
             description: 'Add a user',
             args: {
-                name: { type: GraphQLNonNull(GraphQLString) },
+                firstName: { type: GraphQLNonNull(GraphQLString) },
+                lastName: { type: GraphQLNonNull(GraphQLString) },
                 username: { type: GraphQLNonNull(GraphQLString) },
                 email: { type: GraphQLNonNull(GraphQLString) },
                 password: { type: GraphQLNonNull(GraphQLString) }
             },
-            resolve: async (parent, args) => {
+            resolve: async(parent, args) => {
                 console.log(args)
              
                 let user = await db.models.User.create( { 
-                    frstName: args.firstName,
+                    firstName: args.firstName,
+                    lastName: args.lastName,
                     username: args.username,
                     email: args.email.toLowerCase(),
                     password: args.password,
@@ -332,9 +334,15 @@ const RootMutationType = new GraphQLObjectType({
                         }
                     }
 
-                let newUser = await db.models.User.update(updatedInfo, { where: { id: args.id}})
-                const updatedUser = await db.models.User.findAll({where:{id: args.id}})
-                return updatedUser;
+                db.models.User.update(updatedInfo, { where: { id: args.id}})
+                .then((result) => {
+                    if(result[0]) return {id: result[0]}
+                    })
+                .catch(e => {
+                     console.log(e);
+                })
+                // const updatedUser = await db.models.User.findAll({where:{id: args.id}})
+                // return updatedUser;
                
             }
         },
@@ -381,7 +389,13 @@ const RootMutationType = new GraphQLObjectType({
                     }
                 }
 
-                const updatedskill= await db.models.SkillsOffered.update(updatedInfo,{where:{ id: args.id}})
+                db.models.SkillsOffered.update(updatedInfo,{where:{ id: args.id}})
+                .then((result) => {
+                    if(result[0]) return {id: result[0]}
+                    })
+                .catch(e => {
+                     console.log(e);
+                })
             }
         },
         deleteSkill: {
@@ -428,7 +442,7 @@ const RootMutationType = new GraphQLObjectType({
                 attended: { type: GraphQLBoolean },
                 time:{type:GraphQLString},
             },
-            resolve: async(parent, args) => {
+            resolve: (parent, args) => {
                 console.log(args)
                 const updatedInfo ={}
                 for (const [key,value] of Object.entries(args)){
@@ -436,9 +450,13 @@ const RootMutationType = new GraphQLObjectType({
                         updatedInfo[key] =value
                     }
                 }
-               const updatedClass = await db.models.Classes.update(updatedInfo,{where:{ id: args.id}})
-               return db.models.Classes.findAll({ where :{ id: args.id}})
-
+               db.models.Classes.update(updatedInfo,{where:{ id: args.id}})
+               .then((result) => {
+                if(result[0]) return {id: result[0]}
+                })
+                .catch(e => {
+                     console.log(e);
+                })
                //stephanie works but returns error 
             }
         },
