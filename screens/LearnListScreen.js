@@ -8,21 +8,25 @@ export default  LearnListScreen = ({ route, navigation }) => {
     const {id, name} = route.params 
 
     const dummyClasses =[{
+       skillId: 100, 
        skill: 'Kendo',
        teacher: 'Sam',
        rating: 2.8
     },
     {
+        skillId: 343, 
         skill: 'French',
         teacher: 'Kelsey',
         rating: 3.7
      },
      {
+        skillId: 653, 
         skill: 'Coding in Deno',
         teacher: 'Stephanie',
         rating: 5
      },
      {
+        skillId: 633, 
         skill: 'Jokes',
         teacher: 'Sergey',
         rating: 1

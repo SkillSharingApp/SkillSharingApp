@@ -9,7 +9,7 @@ export default TeachListScreen = ({ route, navigation }) => {
     //on load of screen
     useEffect(()=>{
         //fetch all classes taught by user with matching id
-
+        
         //setClassArray(fetchedClasses);
     }, [])
 

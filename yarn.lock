@@ -5459,6 +5459,11 @@
   "resolved" "https://registry.npmjs.org/react-native-communications/-/react-native-communications-2.2.1.tgz"
   "version" "2.2.1"
 
+"react-native-date-picker@^4.1.1":
+  "integrity" "sha512-2KzwFZoPNmGCgDFP8FrrtIBrKMEzTkLG5Zq68CbyUxG7aFPmeP7ik//lSB0gPwfO9TKQyKFVqTod5jTp0PTnbw=="
+  "resolved" "https://registry.npmjs.org/react-native-date-picker/-/react-native-date-picker-4.1.1.tgz"
+  "version" "4.1.1"
+
 "react-native-gifted-chat@^0.16.3":
   "integrity" "sha512-7EJKQPzzg1yIbLFNq9n5bGJWZ7Woi2bTeT7M4EVSChmFF/qyNos+gFxEcafPkEihEeIxeOne6hBQlYNKmDABgA=="
   "resolved" "https://registry.npmjs.org/react-native-gifted-chat/-/react-native-gifted-chat-0.16.3.tgz"
