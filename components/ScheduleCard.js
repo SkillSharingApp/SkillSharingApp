@@ -1,7 +1,7 @@
 import React from "react";
 import {View, StyleSheet} from 'react-native';
 
-export default LearnListCard = (props) => {
+export default ScheduleCard = (props) => {
     return (
         <View style={styles.card}>
             <View style={styles.cardContent}>
@@ -13,7 +13,7 @@ export default LearnListCard = (props) => {
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 10,
+        borderRadius: 6,
         elevation: 3, 
         backgroundColor: '#fff',
         shadowOffset: { width: 1, height: 1 }, 

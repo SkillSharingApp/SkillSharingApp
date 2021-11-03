@@ -11,7 +11,6 @@ const sequelize = new Sequelize(
         host: 'skillsharedb.cetgdw4b9o0k.us-west-1.rds.amazonaws.com',
         port: '3306',
         dialect: 'mariadb',
-       
     }
 );
 
@@ -168,21 +167,21 @@ User.hasMany(SkillsOffered);
 SkillsOffered.belongsTo(User);
 
 
-//creates 4 people
-    // sequelize.sync({force:true}).then(()=>{
-    //     _.times(10,()=>{
-    //         return User.create({
-    //             firstName:Faker.name.firstName(),
-    // lastName:Faker.name.lastName(),       
-    //             username:Faker.internet.userName(),
-    //             email:Faker.internet.email(),
-    //             password:Faker.internet.password(),
+// //creates 4 people
+//     sequelize.sync().then(()=>{
+//         _.times(10,()=>{
+//             return User.create({
+//                 firstName:Faker.name.firstName(),
+//                 lastName:Faker.name.lastName(),       
+//                 username:Faker.internet.userName(),
+//                 email:Faker.internet.email(),
+//                 password:Faker.internet.password(),
 
-    //         });
-    //     });
-    //     }).catch(function(e) {
-    //         console.log(`server/db,js line 176 ${e}`); 
-    // })
+//             });
+//         });
+//         }).catch(function(e) {
+//             console.log(`server/db,js line 176 ${e}`); 
+//     })
 
 
 module.exports = sequelize
