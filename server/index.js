@@ -2,7 +2,6 @@ const express = require('express');
 const  {graphqlHTTP} = require('express-graphql');
 const  {GraphQLSchema} = require('graphql');
 const { RootQueryType, RootMutationType } = require('./graphQLSchema');
-
 const app = express();
 
 
@@ -18,6 +17,6 @@ app.use('/graphql', graphqlHTTP({
     })
 );
     
-    
+
     
 app.listen(3000, () => console.log('Server running on port 3000....'));
