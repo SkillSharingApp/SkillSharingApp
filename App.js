@@ -49,12 +49,25 @@ const App = (props) => {
     }
   };
 
+  useEffect(() => {
+    console.log(!!instructorStream);
+  }, [instructorStream])
+
 
   return (
   // <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
   <View style={styles.body}>
     <StatusBar barStyle="dark-content" />
-    {instructorStream && <RTCView streamURL = {instructorStream.toURL()} style={styles.stream} />}
+    <View style={{
+    height: '75%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'skyblue'
+    }}>
+    {instructorStream ? <RTCView streamURL = {instructorStream.toURL()} style={styles.stream} />
+     : <Text style={{color: "black"}}>Waiting for connection...</Text>}
+    </View>
     <View>
       <Button title = "Start" onPress = {startInstructorStream} />
       <Button title = "Stop" onPress = {stopInstructorStream} /> 
@@ -65,15 +78,15 @@ const App = (props) => {
 
 const styles = StyleSheet.create({
   body: {
-    backgroundColor: Colors.pink,
+    backgroundColor: 'pink',
     ...StyleSheet.absoluteFill
   },
   stream: {
     flex: 1,
-    height: 100,
+    height: '100%'
   },
   footer: {
-    backgroundColor: Colors.lighter,
+    backgroundColor: 'lightgray',
     position: 'absolute',
     bottom: 0,
     left: 0,
