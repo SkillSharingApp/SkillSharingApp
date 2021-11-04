@@ -7,7 +7,7 @@
 // }
 
 import React, {useState, useEffect} from 'react';
-import PipView from './components/PipView';
+import PipView from '../components/PipView';
 import firestore from '@react-native-firebase/firestore';
 
 
@@ -37,7 +37,7 @@ const props = {
   classId: 1
 };
 
-const App = () => {
+const CallScreen = () => {
   // set instructorStream and studentStream states and handlers
   const [instructorStream, setInstructorStream] = useState(null);
   const [studentStream, setStudentStream] = useState(null);
