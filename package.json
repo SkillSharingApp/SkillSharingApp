@@ -13,9 +13,18 @@
     "@react-native-firebase/app": "^13.0.0",
     "@react-native-firebase/auth": "^13.0.0",
     "@react-native-firebase/firestore": "^13.0.0",
+    "react-native-webrtc": "^1.92.2",
+    "@apollo/client": "^3.4.16",
+    "@react-navigation/native": "^6.0.6",
+    "@react-navigation/native-stack": "^6.2.5",
     "react": "17.0.2",
     "react-native": "0.66.1",
-    "react-native-webrtc": "^1.92.2"
+    "react-native-date-picker": "^4.1.1",
+    "react-native-gifted-chat": "^0.16.3",
+    "react-native-navigation-bar": "^0.2.1",
+    "react-native-ratings": "^8.1.0",
+    "react-native-safe-area-context": "^3.3.2",
+    "react-native-screens": "^3.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
