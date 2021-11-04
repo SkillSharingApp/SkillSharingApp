@@ -45,12 +45,16 @@ const App = () => {
   useEffect( () => {
     if (!props.isInstructor) {
       if (!studentJoined) setStudentJoined(true);
-      classSignals.onSnapshot(snapshot => {
-        let offer = snapshot.get('teacherOffer');
-        if (offer !== '') {
-          setTeacherJoined(true);
-        }
-      });
+      classSignals.onSnapshot( (snapshot) => {
+        // let offer = await snapshot.get({fieldPath: 'teacherOffer'});
+        console.log(JSON.stringify(Reflect.ownKeys(snapshot), null, 2))
+        // console.log(Reflect.ownKeys(offer))
+        // console.log(Reflect.ownKeys(snapshot));
+        // console.log(Reflect.getPrototypeOf(snapshot).constructor);
+        // if (offer !== '') {
+        //   setTeacherJoined(true);
+        // }
+      }, err => console.error(err));
     }
     if (props.isInstructor && !teacherJoined) setTeacherJoined(true);
   }, [])
